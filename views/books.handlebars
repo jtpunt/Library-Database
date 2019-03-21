@@ -1,0 +1,53 @@
+<nav class="navbar navbar-inverse navbar-fixed" id="left-sidebar-wrapper" role="navigation" style="height: 70%;">
+    <ul class="nav sidebar-nav">
+        <li class="sidebar-brand">
+            <h4 style="text-align: center;">Filter By</h4>
+        </li>
+    </ul>
+    <form action="/books/filter" method="get">
+        <label for="publisher_id">Filter By Publisher</label><br>
+        <select name="publisher_id" class="mySelections">{{#each Publishers}}
+            <option value="{{publisher_id}}">{{publisher_name}}</option>{{/each}}
+        </select><button>Submit</button><br>
+    </form><br>
+    <form action="/books/filter" method="get">
+        <label for="author_id">Filter By Author</label><br>
+        <select name="author_id" class="mySelections">{{#each Authors}}
+            <option value="{{author_id}}">{{author_name}}</option>{{/each}}
+        </select><button>Submit</button>
+    </form><br>
+    <form action="/books/filter" method="get">
+        <label for="genre_id">Filter By Genres</label><br>
+        <select name="genre_id" class="mySelections">{{#each Genres}}
+            <option value="{{genre_id}}">{{genre_name}}</option>{{/each}}
+        </select><button>Submit</button><br>
+    </form>
+</nav>
+<div id="maincontent" style="overflow: scroll;">
+{{#each Books}}
+    <div style="height: 27%; border: 1px solid #bdc3c7;"> 
+        <div class="thumbnail" style="float: left;">
+            <img src="{{img_file_url}}">
+        </div>
+        <div style="float: left; margin-left: 1%; margin-top: 1%;">
+            <p>Title: {{title}}</p>
+            <p>Pages: {{pages}}</p>
+            <p>Author: {{Author_Name}}</p>
+            <p>Publisher Name: {{publisher_name}}</p>
+            <p>Genre: {{genre_name}}</p>
+            <p>Copies Available: {{Copies_Available}}</p>
+            <div class="popup" onclick="showPopup(this)">Click To View Description
+                <span class="popuptext">{{description}}</span>
+            </div>
+        </div>
+        <div style="float: right;">
+            <h5>Check Out Book As Patron
+            <select id="{{isbn}}" name="patron_id">{{#each ../Patrons}}
+                <option value="{{patron_id}}">{{patron_name}}</option>{{/each}}
+            </select><button onclick="checkOutBook('{{isbn}}')">Submit</button></h5>
+            <h5>Edit Book <button onclick="location.href='/books/{{isbn}}'">Update</a></h5>
+            <h5>Delete Book <button onclick="deleteFromDB('{{isbn}}')">Submit</button></h5>
+        </div>
+    </div>
+{{/each}}
+</div>

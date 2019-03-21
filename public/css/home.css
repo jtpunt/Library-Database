@@ -1,0 +1,30 @@
+/*******************************************
+* Author: Jonathan Perry
+* Date: 12/03/17
+* Assignment: CS 340 - Project
+*******************************************/
+#maincontent{
+  height:100%; 
+  width:70%;
+  margin: 0 auto;
+}
+.jumbotron{
+  height: 25%; 
+  background-color: #DA4820;
+  border: 2px solid black;
+}
+.jumbotron img {
+  width: 20%; 
+  height: 85%;
+  float:left;
+}
+#myCarousel{
+  height:70%; 
+  width:70%;
+  margin: 0 auto;
+}
+.carousel-inner{
+  height:100%; 
+  width:50%;
+  margin: 0 auto;
+}

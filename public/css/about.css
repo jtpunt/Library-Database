@@ -1,0 +1,30 @@
+/*******************************************
+* Author: Jonathan Perry
+* Date: 12/03/17
+* Assignment: CS 340 - Project
+*******************************************/
+/* Set the max width for the main content and center it*/
+#maincontent{
+  width:70%;
+  margin: 0 auto;
+}
+/* Have the UNT map float left and take up half the space of #maincontent */
+#left-content{
+   float: left; 
+   width: 50%;
+}
+/* Have the UNT map float right and take up half the space of #maincontent*/
+#right-content{
+  float: right;
+  width: 50%;
+}
+/* Center the text for h3 tags */ 
+h3 {
+  text-align: center;
+}
+/* Set the max width/height and border for our google maps div */
+.map{
+  height: 400px; 
+  width: 100%;
+  border: 2px solid black;
+}

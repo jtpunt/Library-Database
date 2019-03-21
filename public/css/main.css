@@ -1,0 +1,43 @@
+/*******************************************
+* Author: Jonathan Perry
+* Date: 12/03/17
+* Assignment: CS 340 - Project
+*******************************************/
+/* Remove the navbar's default margin-bottom and rounded borders */ 
+.navbar {
+  margin-bottom: 0;
+  border-radius: 0;
+}
+/* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+#content{
+	height: 1000px
+}
+.navbar-inverse .navbar-nav>li>a {
+	color: white;
+}
+.navbar-inverse .navbar-brand {
+	color: white;
+}
+/* Set black background color, white text and some padding */
+footer {
+  background-color: yellow;
+  color: black;
+ 	padding: 15px;
+}
+
+/* On small screens, set height to 'auto' for sidenav and grid */
+@media screen and (max-width: 767px) {
+  .sidenav {
+  height: auto;
+  padding: 15px;
+  }
+  .row.content {height:auto;} 
+}
+body{
+  padding-top: 70px;
+}
+.container-fluid {
+  background-color: yellow;
+  color: black;
+}
+.container-fluid>

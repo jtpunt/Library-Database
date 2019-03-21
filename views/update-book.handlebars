@@ -1,0 +1,31 @@
+<div id="maincontent" style="overflow: scroll; margin-left: 15%;">
+    <div class="form-style-3">
+         <h5 style="">Update for {{book.title}} </h5>
+        <form id="update-book" action="/books/{{book.isbn}}?_method=PUT" method="post">
+            <fieldset>
+                <legend>Edit Book Details</legend>
+                <label for="isbn">
+                    <span>ISBN-10<span class="required">*</span></span>
+                    <input type="text" name="isbn" id="isbn" value="{{book.isbn}}" required>
+                </label>
+                <label for="title">
+                    <span>Title Name<span class="required">*</span></span>
+                    <input type="text" name="title" value="{{book.title}}" required>
+                </label>
+                <label for="desc">
+                    <span>Description<span class="required">*</span></span>
+                    <input type="text" name="desc" value="{{book.description}}" required>
+                </label>
+                <label for="pages">
+                    <span>Pages<span class="required">*</span></span>
+                    <input type="number" name="pages" value="{{book.pages}}" required>
+                </label>
+                <label for="img_file_url">
+                    <span>Image URL<span class="required">*</span></span>
+                    <input type="text" name="img_file_url" value="{{book.img_file_url}}" required>
+                </label>
+            </fieldset>
+            <button>Update</button> {{!-- {{runs this after everything is done}} --}}
+        </form>
+    </div>
+</div>
