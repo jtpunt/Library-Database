@@ -33,6 +33,8 @@ var sql = {
 
     getGenres: "SELECT DISTINCT genre_id, genre_name FROM Genres ORDER BY genre_name ASC;",
 
+    getBooksByISBN: "SELECT * FROM Books WHERE isbn = ?",
+
     getBooksByFilter: "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, p.publisher_id,  \
     (SELECT COUNT(bc.isbn) FROM Book_Copies bc WHERE b.isbn = bc.isbn) - \
     (SELECT COUNT(bl.isbn) FROM Book_Loans bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
@@ -42,7 +44,7 @@ var sql = {
     INNER JOIN Genres g ON bg.genre_id = g.genre_id \
     INNER JOIN Book_Authors ba ON b.isbn =  ba.isbn \
     INNER JOIN Authors a ON ba.author_id = a.author_id \
-    GROUP BY b.isbn, Author_Name, a.author_id, g.genre_id, g.genre_name HAVING Copies_Available > 0;",
+    GROUP BY b.isbn, Author_Name, a.author_id, g.genre_id, g.genre_name HAVING Copies_Available > 0 ",
 
     getAuthorID: "SELECT author_id FROM Authors WHERE last_name = ? && first_name = ?",
 
@@ -50,12 +52,11 @@ var sql = {
 
     getPublisherID: "SELECT publisher_id FROM Publishers WHERE publisher_name = ?;",
 	// UPDATE
-	editBook: "UPDATE Books SET title=?, description=?, pages=?, img_file_url=? WHERE isbn=?;",
+	editBookByISBN: "UPDATE Books SET title=?, description=?, pages=?, img_file_url=? WHERE isbn=?;",
 	
 	// DELETE
-	deleteUser: "DELETE FROM Employee WHERE id = ?;",
-	
-	deleteAward: "DELETE FROM Granted WHERE id = ?",
+	delBookByISBN: "DELETE FROM Books WHERE isbn = ?",
+
 
 	// CREATE
 	createUser: (req, res, sql, redirect) => {
