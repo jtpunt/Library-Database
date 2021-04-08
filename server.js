@@ -22,6 +22,7 @@ var app = express();
 **********************************************************************/
 app.engine('handlebars', handlebars.engine); 
 app.set('view engine', 'handlebars');
+app.set('views', __dirname + '/views');
 app.set('mysql', mysql);
 /**********************************************************************
 * Setup what type of data the server can receive via GET/POST requests
