@@ -30,7 +30,7 @@ app.set('mysql', mysql);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); 
 app.use(methodOverride("_method"));
-app.use('/static', express.static('public')); // static directory is going to be our directory called public
+app.use('/static', express.static(__dirname + '/public')); // static directory is going to be our directory called public
 /**********************************************************************
 * Setup Routes For Our Server
 **********************************************************************/
