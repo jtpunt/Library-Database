@@ -210,9 +210,6 @@ router.post('/addBooks', function(req, res){
         }
     }  
 });
-// router.get('/resume',function(req,res){
-// 	res.render('resume');
-// });
 router.use(function(req,res){
 		res.status(404);
 		res.render('404');
