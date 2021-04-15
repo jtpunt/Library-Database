@@ -89,10 +89,10 @@ router.get('/books/filter',function(req,res){
 /* Display one book for the specific purpose of updating information in that book */
 router.get('/books/:id', function(req,res){
     let mysql          = req.app.get('mysql'),
-        getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?".
+        getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
         context       = {
-            css_scripts: ["books.css"],
-            js_scripts:  ["books.js"]
+            css_scripts: ["addBooks.css"],
+            js_scripts:  ["updatebook.js"]
         };
     mysql.pool.query(getBooksByISBN, req.params.id, function(error, results, fields){
         if(error){
@@ -122,8 +122,8 @@ router.get('/books/new',function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
-            css_scripts: ["books.css"],
-            js_scripts:  ["books.js"]
+            css_scripts: ["addBooks.css"],
+            js_scripts:  ["addBooks.js"]
         };
     getPublishers(res, mysql, context, complete);
     getAuthors(res, mysql, context, complete);
