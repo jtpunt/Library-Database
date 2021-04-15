@@ -3,68 +3,77 @@
 * Date: 12/03/17
 * Assignment: CS 340 - Project
 *******************************************/
-var express    = require("express"),
-    // middleware = require("../middleware"),
-    sql        = require("../sql"),
-    router = express.Router();
+var express = require("express"),
+    router  = express.Router();
 
 router.get('/',function(req,res){
     var context = {};
     context.css_scripts = ["home.css"];
     res.render('home', context);
 });
-router.get('/books',function(req,res){
-  	var callbackCount = 0;
-    var context = {};
-    var mysql = req.app.get('mysql');
-    context.css_scripts = ["books.css"];
-    context.js_scripts = ["books.js"];
-    getBooks(res, mysql, context, complete);
-    getPublishers(res, mysql, context, complete);
-    getAuthors(res, mysql, context, complete);
-    getGenres(res, mysql, context, complete);
-    getPatrons(res, mysql, context, complete);
-    function complete(){
-        callbackCount++;
-        if(callbackCount >= 5){
-            res.render('books', context);
+router.route('/books')
+    .get(
+        (req, res) => {
+          	let callbackCount = 0,
+                mysql         = req.app.get('mysql'),
+                context       = {
+                    css_scripts: ["books.css"],
+                    js_scripts:  ["books.js"]
+                }
+            
+            getBooks(res, mysql, context, complete);
+            getPublishers(res, mysql, context, complete);
+            getAuthors(res, mysql, context, complete);
+            getGenres(res, mysql, context, complete);
+            getPatrons(res, mysql, context, complete);
+            function complete(){
+                callbackCount++;
+                if(callbackCount >= 5){
+                    res.render('books', context);
+                }
+            }
         }
-    }
-});
-router.post('/books',function(req,res){
-    var context = {};
-    var mysql = req.app.get('mysql');
-    // this function returns an available copy number for the book that's being loaned out
-    getAvailableCopy(res, mysql, [req.body.isbn, req.body.isbn], context, complete);
-    function complete(){
-        var inserts = [req.body.isbn, context.Available, req.body.patron_id, '2017-12-01'];
-        insertBookLoan(res, mysql, inserts, finalComplete)
-    }
-    function finalComplete(){
-        // WARNING: Initially did not work on OSU server for some reason
-        //res.redirect(req.get('referer')); // refreshed the current page
-        res.end();
-    }
-});
-router.delete('/books', function(req,res){
-    var mysql = req.app.get('mysql');
-    console.log(req.body.isbn);
-    var inserts = [req.params.id];
-    var delBookByISBN = "DELETE FROM Books WHERE isbn = ?";
-    mysql.pool.query(delBookByISBN, req.body.isbn, function(error, results, fields){
-        if(error){
-            res.write(JSON.stringify(error));
-            res.status(400).end();
+    )
+    .post(
+        (req, res) =>{
+            let context = {},
+                mysql   = req.app.get('mysql');
+            // this function returns an available copy number for the book that's being loaned out
+            getAvailableCopy(res, mysql, [req.body.isbn, req.body.isbn], context, complete);
+            function complete(){
+                var inserts = [req.body.isbn, context.Available, req.body.patron_id, '2017-12-01'];
+                insertBookLoan(res, mysql, inserts, finalComplete)
+            }
+            function finalComplete(){
+                // WARNING: Initially did not work on OSU server for some reason
+                //res.redirect(req.get('referer')); // refreshed the current page
+                res.end();
+            }
         }
-        res.end();
-    });
-});
+    )
+    .delete(
+        (req, res) => {
+            let mysql         = req.app.get('mysql'),
+                inserts       = [req.params.id],
+                delBookByISBN = "DELETE FROM Books WHERE isbn = ?";
+            mysql.pool.query(delBookByISBN, req.body.isbn, function(error, results, fields){
+                if(error){
+                    res.write(JSON.stringify(error));
+                    res.status(400).end();
+                }
+                res.end();
+            });
+        }
+    );
+
 router.get('/books/filter',function(req,res){
-    var callbackCount = 0;
-    var context = {};
-    var mysql = req.app.get('mysql');
-    context.css_scripts = ["books.css"];
-    context.js_scripts = ["books.js"];
+    let callbackCount = 0,
+        mysql         = req.app.get('mysql'),
+        context       = {
+            css_scripts: ["books.css"],
+            js_scripts:  ["books.js"]
+        };
+
     getBooksByFilter(res, mysql, context, req, complete);
     getPublishers(res, mysql, context, complete);
     getAuthors(res, mysql, context, complete);
@@ -79,11 +88,12 @@ router.get('/books/filter',function(req,res){
 });
 /* Display one book for the specific purpose of updating information in that book */
 router.get('/books/:id', function(req,res){
-    var context = {};
-    var mysql = req.app.get('mysql');
-    context.js_scripts = ["updatebook.js"];
-    context.css_scripts = ["addBooks.css"];
-    var getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?";
+    let mysql          = req.app.get('mysql'),
+        getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?".
+        context       = {
+            css_scripts: ["books.css"],
+            js_scripts:  ["books.js"]
+        };
     mysql.pool.query(getBooksByISBN, req.params.id, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -95,10 +105,9 @@ router.get('/books/:id', function(req,res){
 });
 /* The URI that update data is sent to in order to update a book */
 router.put('/books/:isbn',function(req,res){
-    console.log(" in update route");
-    var mysql = req.app.get('mysql');
-    var inserts = [req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.isbn];
-    var editBookByISBN = "UPDATE Books SET title=?, description=?, pages=?, img_file_url=? WHERE isbn=?;";
+    let mysql          = req.app.get('mysql'),
+        inserts        = [req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.isbn],
+        editBookByISBN = "UPDATE Books SET title=?, description=?, pages=?, img_file_url=? WHERE isbn=?;";
     mysql.pool.query(editBookByISBN, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -109,12 +118,13 @@ router.put('/books/:isbn',function(req,res){
         }
     });
 });
-router.get('/addBooks',function(req,res){
-    var callbackCount = 0;
-    var context = {};
-    context.css_scripts = ["addBooks.css"];
-    context.js_scripts = ["addBooks.js"];
-    var mysql = req.app.get('mysql');
+router.get('/books/new',function(req,res){
+    let callbackCount = 0,
+        mysql         = req.app.get('mysql'),
+        context       = {
+            css_scripts: ["books.css"],
+            js_scripts:  ["books.js"]
+        };
     getPublishers(res, mysql, context, complete);
     getAuthors(res, mysql, context, complete);
     getGenres(res, mysql, context, complete);
@@ -126,7 +136,7 @@ router.get('/addBooks',function(req,res){
     }
 });
 /* Adds a book, redirects to the book page after adding */
-router.post('/addBooks', function(req, res){
+router.post('/books/new', function(req, res){
     var context = {};
     var childCallCount = 0;
     var parentCalls = 0;
