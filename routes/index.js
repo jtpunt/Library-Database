@@ -8,7 +8,7 @@ var express = require("express"),
 
 router.get('/',function(req,res){
     var context = {};
-    context.css_scripts = ["home.css"];
+    context.stylesheets = ["/static/css/home.css"];
     res.render('home', context);
 });
 router.route('/books')
@@ -102,8 +102,8 @@ router.route('/books')
           	let callbackCount = 0,
                 mysql         = req.app.get('mysql'),
                 context       = {
-                    css_scripts: ["books.css"],
-                    js_scripts:  ["books.js"]
+                    stylesheets: ["/static/css/books.css"],
+                    scripts:  ["/static/js/books.js"]
                 }
             
             getBooks(res, mysql, context, complete);
@@ -124,8 +124,8 @@ router.get('/books/filter',function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
-            css_scripts: ["books.css"],
-            js_scripts:  ["books.js"]
+            stylesheets: ["/static/css/books.css"],
+            scripts:  ["/static/js/books.js"]
         };
 
     getBooksByFilter(res, mysql, context, req, complete);
@@ -144,8 +144,8 @@ router.get('/books/new',function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
-            css_scripts: ["addBooks.css"],
-            js_scripts:  ["addBooks.js"]
+            stylesheets: ["/static/css/addBooks.css"],
+            scripts:  ["/static/js/addBooks.js"]
         };
     getPublishers(res, mysql, context, complete);
     getAuthors(res, mysql, context, complete);
@@ -221,8 +221,8 @@ router.get('/books/:isbn/edit', function(req,res){
         isbnParam      = req.params.isbn,
         getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
         context        = {
-            css_scripts: ["addBooks.css"],
-            js_scripts:  ["updatebook.js"]
+            stylesheets: ["/static/css/addBooks.css"],
+            scripts:  ["/static/js/updatebook.js"]
         };
     mysql.pool.query(getBooksByISBN, isbnParam, function(error, results, fields){
         if(error){

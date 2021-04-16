@@ -9,7 +9,7 @@
 var express = require('express');
 var routes = require('./routes/index.js');
 var mysql = require('./dbcon.js');
-var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+// var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 var bodyParser = require('body-parser'); // body parser middleware
 var methodOverride = require("method-override");
 var port = 3005;
@@ -20,8 +20,9 @@ var app = express();
 * 'handlebars' by registering 'handlebars' as our view engine using its
 * bound 'engine' function.
 **********************************************************************/
-app.engine('handlebars', handlebars.engine); 
-app.set('view engine', 'handlebars');
+// app.engine('handlebars', handlebars.engine); 
+// app.set('view engine', 'handlebars');
+app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.set('mysql', mysql);
 /**********************************************************************
