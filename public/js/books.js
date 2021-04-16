@@ -19,7 +19,7 @@ function checkOutBook(isbn){
 	myObj.isbn = isbn;
 	myObj.patron_id = document.getElementById(isbn).value;
     $.ajax({
-        url: '/books',
+        url: '/books/' + isbn,
         type: 'post',
         dataType: "text",
         data: JSON.stringify(myObj),
@@ -34,7 +34,7 @@ function deleteFromDB(isbn){
 	var myObj = {};
 	myObj.isbn = isbn;
     $.ajax({
-        url: '/books',
+        url: '/books/' + isbn,
         type: 'delete',
         dataType: "text",
  		data: JSON.stringify(myObj),

@@ -45,7 +45,7 @@
             <select id="{{isbn}}" name="patron_id">{{#each ../Patrons}}
                 <option value="{{patron_id}}">{{patron_name}}</option>{{/each}}
             </select><button onclick="checkOutBook('{{isbn}}')">Submit</button></h5>
-            <h5>Edit Book <button onclick="location.href='/books/{{isbn}}'">Update</a></h5>
+            <h5>Edit Book <button onclick="location.href='/books/{{isbn}}/edit'">Update</a></h5>
             <h5>Delete Book <button onclick="deleteFromDB('{{isbn}}')">Submit</button></h5>
         </div>
     </div>

@@ -12,6 +12,91 @@ router.get('/',function(req,res){
     res.render('home', context);
 });
 router.route('/books')
+    // CREATE a book
+    .post(
+        (req, res) =>{
+            var context = {};
+            var childCallCount = 0;
+            var parentCalls = 0;
+            var parentCallCount = 0;
+            var flag = false; // false - we have parent table data to insert. true - we only have child table data to insert
+            var mysql = req.app.get('mysql');
+
+            // insert data for parent tables (authors, genres, publishers), which has to be added into the database before other data is added in
+            var newAuthorInserts = [req.body.author_lname, req.body.author_fname];
+            var newGenreInserts = [req.body.genre_name];
+            var newPublisherInserts = [req.body.publisher_name, req.body.city_name, req.body.city_state];
+
+            // insert data for child table which is dependent on the publisher table having an already existing publisher_id
+            var bookInserts = [req.body.isbn, req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.publisher[0]];
+
+            // insert data for child tables which are all dependend on the book table having an already exisitng isbn
+            var bookAuthorInserts = [req.body.isbn, req.body.author[0]]; 
+            var bookGenreInserts = [req.body.isbn, req.body.genre[0]]; 
+            var bookCopiesInserts = [req.body.isbn, req.body.copies];
+
+            // all of these if conditions tell us that we have new parent table data that we are adding into the database before we add in our new book
+            if(req.body.author === "Add New Author") parentCalls++;
+            if(req.body.genre === "Add New Genre") parentCalls++;
+            if(req.body.publisher === "Add New Publisher") parentCalls++;
+
+            // skip ahead to insert data into the Books table, Book_Authors, Book_Copies, and Book_Genre tables
+            if(req.body.author != "Add New Author" && req.body.genre != "Add New Genre" && req.body.publisher != "Add New Publisher") { 
+                flag = true;
+                parentComplete();
+            }
+
+            if(req.body.author === "Add New Author"){
+                insertAuthor(res, mysql, newAuthorInserts, authorComplete);
+                function authorComplete(){
+                    getAuthorID(res, mysql, newAuthorInserts, context, getAuthorComplete);
+                }
+                function getAuthorComplete(){
+                    bookAuthorInserts[1] = context.author.author_id; // reassign the value of index 1 to our new author_id
+                    parentComplete();
+                }
+            } 
+            if(req.body.genre === "Add New Genre"){
+                insertGenre(res, mysql, newGenreInserts, genreComplete);
+                function genreComplete(){
+                    getGenreID(res, mysql, newGenreInserts, context, getGenreComplete);
+                }
+                function getGenreComplete(){
+                    bookGenreInserts[1] = context.genre.genre_id;
+                    parentComplete();
+                }
+            }
+            if(req.body.publisher === "Add New Publisher") {
+                insertPublisher(res, mysql, newPublisherInserts, publisherComplete); // publisher is the main parent table on which the book table is dependend on
+                function publisherComplete(){
+                    getPublisherID(res, mysql, req.body.publisher_name, context, getPublisherComplete);
+                }
+                function getPublisherComplete(){
+                    bookInserts[5] = context.publisher.publisher_id;
+                    parentComplete();
+                }
+            }
+            function parentComplete(){
+                parentCallCount++;
+                if(flag === true) parentCallCount = 0;
+                if(parentCallCount === parentCalls){
+                    insertBook(res, mysql, bookInserts, complete); // FIRST THREE insert statements must EXECUTE before the last 4 or it'll ERROR out
+                    function complete(){
+                        insertBookAuthor(res, mysql, bookAuthorInserts, finalComplete); // Because we must have a valid ISBN, author_id, genre_id, publisher_id
+                        insertBookGenre(res, mysql, bookGenreInserts, finalComplete); // due to foreign key restraints. In other words, these keys must exist in the parent table.           
+                        insertBookCopies(res, mysql, bookCopiesInserts, finalComplete);
+                    }
+                    function finalComplete(){
+                        childCallCount++;
+                        if(childCallCount >= 3){
+                            res.redirect('books');
+                        }
+                    }
+                }
+            }
+        }
+    )
+    // RETRIEVE all books
     .get(
         (req, res) => {
           	let callbackCount = 0,
@@ -34,37 +119,6 @@ router.route('/books')
             }
         }
     )
-    .post(
-        (req, res) =>{
-            let context = {},
-                mysql   = req.app.get('mysql');
-            // this function returns an available copy number for the book that's being loaned out
-            getAvailableCopy(res, mysql, [req.body.isbn, req.body.isbn], context, complete);
-            function complete(){
-                var inserts = [req.body.isbn, context.Available, req.body.patron_id, '2017-12-01'];
-                insertBookLoan(res, mysql, inserts, finalComplete)
-            }
-            function finalComplete(){
-                // WARNING: Initially did not work on OSU server for some reason
-                //res.redirect(req.get('referer')); // refreshed the current page
-                res.end();
-            }
-        }
-    )
-    .delete(
-        (req, res) => {
-            let mysql         = req.app.get('mysql'),
-                inserts       = [req.params.id],
-                delBookByISBN = "DELETE FROM Books WHERE isbn = ?";
-            mysql.pool.query(delBookByISBN, req.body.isbn, function(error, results, fields){
-                if(error){
-                    res.write(JSON.stringify(error));
-                    res.status(400).end();
-                }
-                res.end();
-            });
-        }
-    );
 
 router.get('/books/filter',function(req,res){
     let callbackCount = 0,
@@ -86,38 +140,6 @@ router.get('/books/filter',function(req,res){
         }
     }
 });
-/* Display one book for the specific purpose of updating information in that book */
-router.get('/books/:id', function(req,res){
-    let mysql          = req.app.get('mysql'),
-        getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
-        context       = {
-            css_scripts: ["addBooks.css"],
-            js_scripts:  ["updatebook.js"]
-        };
-    mysql.pool.query(getBooksByISBN, req.params.id, function(error, results, fields){
-        if(error){
-            res.write(JSON.stringify(error));
-            res.end();
-        }else
-            context.book = results[0];             
-            res.render('update-book', context);
-    });
-});
-/* The URI that update data is sent to in order to update a book */
-router.put('/books/:isbn',function(req,res){
-    let mysql          = req.app.get('mysql'),
-        inserts        = [req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.isbn],
-        editBookByISBN = "UPDATE Books SET title=?, description=?, pages=?, img_file_url=? WHERE isbn=?;";
-    mysql.pool.query(editBookByISBN, inserts, function(error, results, fields){
-        if(error){
-            res.write(JSON.stringify(error));
-            res.end();
-        }else{
-            res.status(200);
-            res.redirect("/books");
-        }
-    });
-});
 router.get('/books/new',function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
@@ -135,87 +157,87 @@ router.get('/books/new',function(req,res){
         }
     }
 });
-/* Adds a book, redirects to the book page after adding */
-router.post('/books/new', function(req, res){
-    var context = {};
-    var childCallCount = 0;
-    var parentCalls = 0;
-    var parentCallCount = 0;
-    var flag = false; // false - we have parent table data to insert. true - we only have child table data to insert
-    var mysql = req.app.get('mysql');
-
-    // insert data for parent tables (authors, genres, publishers), which has to be added into the database before other data is added in
-    var newAuthorInserts = [req.body.author_lname, req.body.author_fname];
-    var newGenreInserts = [req.body.genre_name];
-    var newPublisherInserts = [req.body.publisher_name, req.body.city_name, req.body.city_state];
-
-    // insert data for child table which is dependent on the publisher table having an already existing publisher_id
-    var bookInserts = [req.body.isbn, req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.publisher[0]];
-
-    // insert data for child tables which are all dependend on the book table having an already exisitng isbn
-    var bookAuthorInserts = [req.body.isbn, req.body.author[0]]; 
-    var bookGenreInserts = [req.body.isbn, req.body.genre[0]]; 
-    var bookCopiesInserts = [req.body.isbn, req.body.copies];
-
-    // all of these if conditions tell us that we have new parent table data that we are adding into the database before we add in our new book
-    if(req.body.author === "Add New Author") parentCalls++;
-    if(req.body.genre === "Add New Genre") parentCalls++;
-    if(req.body.publisher === "Add New Publisher") parentCalls++;
-
-    // skip ahead to insert data into the Books table, Book_Authors, Book_Copies, and Book_Genre tables
-    if(req.body.author != "Add New Author" && req.body.genre != "Add New Genre" && req.body.publisher != "Add New Publisher") { 
-        flag = true;
-        parentComplete();
-    }
-
-    if(req.body.author === "Add New Author"){
-        insertAuthor(res, mysql, newAuthorInserts, authorComplete);
-        function authorComplete(){
-            getAuthorID(res, mysql, newAuthorInserts, context, getAuthorComplete);
-        }
-        function getAuthorComplete(){
-            bookAuthorInserts[1] = context.author.author_id; // reassign the value of index 1 to our new author_id
-            parentComplete();
-        }
-    } 
-    if(req.body.genre === "Add New Genre"){
-        insertGenre(res, mysql, newGenreInserts, genreComplete);
-        function genreComplete(){
-            getGenreID(res, mysql, newGenreInserts, context, getGenreComplete);
-        }
-        function getGenreComplete(){
-            bookGenreInserts[1] = context.genre.genre_id;
-            parentComplete();
-        }
-    }
-    if(req.body.publisher === "Add New Publisher") {
-        insertPublisher(res, mysql, newPublisherInserts, publisherComplete); // publisher is the main parent table on which the book table is dependend on
-        function publisherComplete(){
-            getPublisherID(res, mysql, req.body.publisher_name, context, getPublisherComplete);
-        }
-        function getPublisherComplete(){
-            bookInserts[5] = context.publisher.publisher_id;
-            parentComplete();
-        }
-    }
-    function parentComplete(){
-        parentCallCount++;
-        if(flag === true) parentCallCount = 0;
-        if(parentCallCount === parentCalls){
-            insertBook(res, mysql, bookInserts, complete); // FIRST THREE insert statements must EXECUTE before the last 4 or it'll ERROR out
+router.route('/books/:isbn')
+    // CREATE a book loan by isbn 
+    .post(
+        (req, res) =>{
+            let context = {},
+                mysql   = req.app.get('mysql');
+            // this function returns an available copy number for the book that's being loaned out
+            getAvailableCopy(res, mysql, [req.body.isbn, req.body.isbn], context, complete);
             function complete(){
-                insertBookAuthor(res, mysql, bookAuthorInserts, finalComplete); // Because we must have a valid ISBN, author_id, genre_id, publisher_id
-                insertBookGenre(res, mysql, bookGenreInserts, finalComplete); // due to foreign key restraints. In other words, these keys must exist in the parent table.           
-                insertBookCopies(res, mysql, bookCopiesInserts, finalComplete);
+                var inserts = [req.body.isbn, context.Available, req.body.patron_id, '2017-12-01'];
+                insertBookLoan(res, mysql, inserts, finalComplete)
             }
             function finalComplete(){
-                childCallCount++;
-                if(childCallCount >= 3){
-                    res.redirect('books');
-                }
+                // WARNING: Initially did not work on OSU server for some reason
+                //res.redirect(req.get('referer')); // refreshed the current page
+                res.end();
             }
         }
-    }  
+    )
+    // Retrieve a book by isbn
+    .get(
+        (req, res) => {
+
+        }
+    )
+    // updates a book by the isbn given in the URI parameter
+    .put(
+        (req, res) => {
+            let mysql          = req.app.get('mysql'),
+                inserts        = [req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.isbn],
+                editBookByISBN = "UPDATE Books SET title=?, description=?, pages=?, img_file_url=? WHERE isbn=?;";
+            mysql.pool.query(editBookByISBN, inserts, function(error, results, fields){
+                if(error){
+                    res.write(JSON.stringify(error));
+                    res.end();
+                }else{
+                    res.status(200);
+                    res.redirect("/books");
+                }
+            });
+        }
+    )
+    // Delete a book by isbn
+    .delete(
+        (req, res) => {
+            let mysql         = req.app.get('mysql'),
+                inserts       = [req.params.id],
+                delBookByISBN = "DELETE FROM Books WHERE isbn = ?";
+            mysql.pool.query(delBookByISBN, req.body.isbn, function(error, results, fields){
+                if(error){
+                    res.write(JSON.stringify(error));
+                    res.status(400).end();
+                }
+                res.end();
+            });
+        }
+    );
+
+/* Display one book for the specific purpose of updating information in that book */
+router.get('/books/:isbn/edit', function(req,res){
+    let mysql          = req.app.get('mysql'),
+        isbnParam      = req.params.isbn,
+        getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
+        context        = {
+            css_scripts: ["addBooks.css"],
+            js_scripts:  ["updatebook.js"]
+        };
+    mysql.pool.query(getBooksByISBN, isbnParam, function(error, results, fields){
+        if(error){
+            res.write(JSON.stringify(error));
+            res.end();
+        }else
+            context.book = results[0];             
+            res.render('update-book', context);
+    });
+});
+
+
+/* Adds a book, redirects to the book page after adding */
+router.post('/books/new', function(req, res){
+      
 });
 router.use(function(req,res){
 		res.status(404);
