@@ -42,20 +42,33 @@
         </label>
          <label for="author">
             <span>Authors<span class="required">*</span></span>
-            <select name="author" class="mySelections" required>{{#each Authors}}
-                <option value="{{author_id}}">{{author_name}}</option>{{/each}}
+            <select name="author" class="mySelections" required>
+                <!-- <option value="">Pick a Author</option> -->
+                <% Authors.forEach(function(author){ %>
+                    <option value="<%=author.publisher_id%>"><%=author.author_name%></option>
+                <% }); %>
+                <!-- <option value="">Add New Author</option> -->
             </select>
         </label>
         <label for="publisher">
             <span>Publisher<span class="required">*</span></span>
-            <select name="publisher" class="mySelections" required>{{#each Publishers}}
-                <option value="{{publisher_id}}">{{publisher_name}}</option>{{/each}}
+            <select name="publisher" class="mySelections" required>
+                <!-- <option value="">Pick a Publisher</option> -->
+
+                <% Publishers.forEach(function(publisher){ %>
+                    <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
+                <% }); %>
+                <!-- <option value="">Add New Publisher</option> -->
             </select>
         </label>
         <label for="genre">
             <span>Genres<span class="required">*</span></span>
-            <select name="genre" class="mySelections" required>{{#each Genres}}
-                <option value="{{genre_id}}">{{genre_name}}</option>{{/each}}
+            <select name="genre" class="mySelections" required>
+                <!-- <option value="">Pick a Genre</option> -->
+                <% Genres.forEach(function(genre){ %>
+                    <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
+                <% }); %>
+                <!-- <option value="">Add New Genre</option> -->
             </select>
         </label> 
     </fieldset>

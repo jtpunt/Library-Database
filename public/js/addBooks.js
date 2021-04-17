@@ -52,22 +52,27 @@ document.addEventListener('DOMContentLoaded',function() {
 }, false);
 
 function changeEventHandler(event) {
+	console.log("event triggered");
+	console.log(`${event.target.name} ${event.target.value} event`);
 	if(event.target.name === "publisher"){
+		let newPublisherEle = document.getElementById("newPublisher");
 		if(event.target.value === "Add New Publisher")
-			document.getElementById("newPublisher").removeAttribute("hidden", false);
+			newPublisherEle.hidden = false;
 		else
-			document.getElementById("newPublisher").setAttribute("hidden", true);
+			newPublisher.hidden = true;
 	}
 	else if(event.target.name === "author"){
+		let newAuthorEle = document.getElementById("newAuthor");
 		if(event.target.value === "Add New Author")
-			document.getElementById("newAuthor").removeAttribute("hidden", false);
+			newAuthorEle.hidden = false;
 		else
-			document.getElementById("newAuthor").setAttribute("hidden", true);
+			newAuthorEle.hidden = true;
 	}
 	else if(event.target.name === "genre"){
+		let newGenreEle = document.getElementById("newGenre");
 		if(event.target.value === "Add New Genre")
-			document.getElementById("newGenre").removeAttribute("hidden", false);
+			newGenreEle.hidden = false;
 		else
-			document.getElementById("newGenre").setAttribute("hidden", true);
+			newGenreEle.hidden = true;
 	}
 }
