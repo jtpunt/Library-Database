@@ -6,14 +6,14 @@
 /**********************************************************************
 * The tools needed for this web application
 **********************************************************************/
-var express = require('express');
-var mysql = require('./dbcon.js');
-// var handlebars = require('express-handlebars').create({defaultLayout:'main'});
-var bodyParser = require('body-parser'); // body parser middleware
-var methodOverride = require("method-override");
-var port = 3005;
-var ip = process.env.IP;
-var app = express();
+var express = require('express'),
+	mysql = require('./dbcon.js'),
+	bodyParser = require('body-parser'), // body parser middleware
+	methodOverride = require("method-override"),
+	flash          = require("connect-flash"),
+	port = 3005,
+	ip = process.env.IP,
+	app = express();
 
 // Requiring routes
 var indexRoutes = require("./routes/index"),
@@ -35,6 +35,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); 
 app.use(methodOverride("_method"));
 app.use('/static', express.static(__dirname + '/public')); // static directory is going to be our directory called public
+app.use(flash()); // must be used before passport configuration
+
+// PASSPORT CONFIGURATION
+app.use(require("express-session")({
+    secret: "Once again Rusty wins cutest dog!",
+    resave: false,
+    saveUninitialized: false
+}));
+
+// w/e function we provide to it will be called on every route
+app.use(function(req, res, next){
+    // w/e we put in res.locals is what's available inside of our template
+    res.locals.currentUser = req.session.username;
+    res.locals.admin_user  = req.session.admin;
+    res.locals.normal_user = req.session.normal_user;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
+    next();
+});
 /**********************************************************************
 * Setup Routes For Our Server
 **********************************************************************/

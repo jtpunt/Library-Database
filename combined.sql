@@ -1,13 +1,12 @@
-
-DROP TABLE IF EXISTS `Books`;
 DROP TABLE IF EXISTS `Book_Copies`;
-DROP TABLE IF EXISTS `Authors`;
 DROP TABLE IF EXISTS `Book_Authors`;
+DROP TABLE IF EXISTS `Authors`;
+DROP TABLE IF EXISTS `Book_Genres`;
+DROP TABLE IF EXISTS `Book_Loans`;
+DROP TABLE IF EXISTS `Books`;
 DROP TABLE IF EXISTS `Publishers`;
 DROP TABLE IF EXISTS `Genres`;
-DROP TABLE IF EXISTS `Book_Genres`;
 DROP TABLE IF EXISTS `Patrons`;
-DROP TABLE IF EXISTS `Book_Loans`;
 
 CREATE TABLE Publishers(
   publisher_id   int          NOT NULL AUTO_INCREMENT,
@@ -74,10 +73,13 @@ CREATE TABLE Patrons(
   patron_id  int        	NOT NULL AUTO_INCREMENT,
   last_name  varchar(255) NOT NULL,
   first_name varchar(255) NOT NULL,
+  email      varchar(255) NOT NULL,
+  password   varchar(10)  NOT NULL,
   address    varchar(255) NOT NULL,
   city       varchar(255) NOT NULL,
   zipcode    int(6)       NOT NULL,
   CONSTRAINT unique_Patrons UNIQUE(first_name, last_name),
+  CONSTRAINT unique_Email   UNIQUE(email),
   PRIMARY KEY (patron_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -95,8 +97,8 @@ CREATE TABLE Book_Loans(
 /***********************
 * Patrons Inserts
 ***********************/
-INSERT INTO Patrons(last_name, first_name, address, city, zipcode) VALUES ('Perry', 'Jonathan', '3560 Country Square Dr', 'Carrollton', 75006);
-INSERT INTO Patrons(last_name, first_name, address, city, zipcode) VALUES ('Pinkerton', 'Mike', '923 W Sycamore St', 'Denton', 76201);
+INSERT INTO Patrons(last_name, first_name, email, password, address, city, zipcode) VALUES ('Perry', 'Jonathan', 'jonathan.perry1994@gmail.com', 'password', '3560 Country Square Dr', 'Carrollton', 75006);
+INSERT INTO Patrons(last_name, first_name, email, password, address, city, zipcode) VALUES ('Pinkerton', 'Mike', 'mike.pinkerton@gmail.com', 'password', '923 W Sycamore St', 'Denton', 76201);
 /***********************
 * Genres Inserts
 ***********************/

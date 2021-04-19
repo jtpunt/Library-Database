@@ -24,9 +24,9 @@ router.get('/login', function(req, res){
 router.post('/login', function(req, res){
     console.log("IN LOGIN - POST");
     var mysql = req.app.get('mysql');
-    var sql = "SELECT * FROM User WHERE username = ? AND password = ?;";
-    var inserts = [req.body.user_name, req.body.user_pw]; 
-    var redirect = "/admin"; // Go to admin page by default
+    var sql = "SELECT * FROM Patrons WHERE email = ? AND password = ?;";
+    var inserts = [req.body.email, req.body.password]; 
+    var redirect = "/books"; // Go to books page by default
     console.log(inserts);     
     sql = mysql.pool.query(sql,inserts,function(error, results, fields){
         console.log(results);
@@ -41,17 +41,18 @@ router.post('/login', function(req, res){
             }
             else {
                 console.log(results);
-                if(results[0].permission){ // admin user
-                    req.session.admin = true;
-                    req.session.normal_user = false;
-                }else{ // normal user
-                    req.session.normal_user = true;
-                    req.session.admin = false;
-                    req.session.user_id = results[0].id;
-                    redirect="/user"; // Go to user dashboard
-                 }
-                req.session.username = results[0].username;
-                req.flash("success", "Successfully logged in as " + results[0].username + ".");
+                // if(results[0].permission){ // admin user
+                //     req.session.admin = true;
+                //     req.session.normal_user = false;
+                // }else{ // normal user
+                //     req.session.normal_user = true;
+                //     req.session.admin = false;
+                //     req.session.user_id = results[0].id;
+                //     redirect = "/user"; // Go to user dashboard
+                //  }
+                req.session.fullname = results[0].first_name + ' ' + results[0].last_name;
+                console.log(`fullname - ${req.session.fullname}`);
+                req.flash("success", "Successfully logged in as " + req.session.fullname + ".");
                 res.redirect(redirect);
             }
         }
