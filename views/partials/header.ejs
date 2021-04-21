@@ -33,8 +33,12 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a href="/books" style="color: black">View Books<span class="sr-only">(current)</span></a></li>
-                    <li><a href="/books/new" style="color: black">Add Books</a></li>
+                   <li><a href="/books" style="color: black">View Books<span class="sr-only">(current)</span></a></li>
+                    <% if(currentUser){ %>
+                        <% if(admin_user){ %>
+                          <li><a href="/books/new" style="color: black">Add Books</a></li>
+                        <% } %>
+                    <% } %>
                     <% if(error && error.length > 0){ %>
                         <li id="alert-danger"><span class="alert alert-danger" role="alert" style="display: inline-block;position: relative;z-index: 1;padding: 1em;margin: 0em;"><%=error%></span></li>
                         <script>
