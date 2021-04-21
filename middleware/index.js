@@ -1,5 +1,5 @@
 var middleware = {
-	isUser(req, res, next){
+	isPatron(req, res, next){
 		if(req.session.normal_user){
 	        return next();
 	    }
@@ -7,6 +7,7 @@ var middleware = {
 	    res.redirect("/login");
 	},
 	isLoggedIn(req, res, next){
+		console.log("in middleware is isLoggedIn fn");
 	    if(req.session.normal_user || req.session.admin){
 	        return next();
 	    }

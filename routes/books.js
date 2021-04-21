@@ -4,8 +4,9 @@
 * Assignment: CS 340 - Project 
 *******************************************/
 
-var express = require("express"),
-    router  = express.Router();
+var express    = require("express"),
+    middleware = require("../middleware"),
+    router     = express.Router();
 
 router.route('/')
     // CREATE a book
@@ -93,7 +94,7 @@ router.route('/')
         }
     )
     // RETRIEVE all books
-    .get(
+    .get(middleware.isLoggedIn,
         (req, res) => {
           	let callbackCount = 0,
                 mysql         = req.app.get('mysql'),

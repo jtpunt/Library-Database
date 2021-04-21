@@ -70,14 +70,15 @@ CREATE TABLE Book_Genres(
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE Patrons(
-  patron_id  int        	NOT NULL AUTO_INCREMENT,
-  last_name  varchar(255) NOT NULL,
-  first_name varchar(255) NOT NULL,
-  email      varchar(255) NOT NULL,
-  password   varchar(10)  NOT NULL,
-  address    varchar(255) NOT NULL,
-  city       varchar(255) NOT NULL,
-  zipcode    int(6)       NOT NULL,
+  patron_id        int        	NOT NULL AUTO_INCREMENT,
+  last_name        varchar(255) NOT NULL,
+  first_name       varchar(255) NOT NULL,
+  email            varchar(255) NOT NULL,
+  password         varchar(10)  NOT NULL,
+  admin_permission BOOLEAN      NOT NULL,
+  address          varchar(255) NOT NULL,
+  city             varchar(255) NOT NULL,
+  zipcode          int(6)       NOT NULL,
   CONSTRAINT unique_Patrons UNIQUE(first_name, last_name),
   CONSTRAINT unique_Email   UNIQUE(email),
   PRIMARY KEY (patron_id)
@@ -97,8 +98,8 @@ CREATE TABLE Book_Loans(
 /***********************
 * Patrons Inserts
 ***********************/
-INSERT INTO Patrons(last_name, first_name, email, password, address, city, zipcode) VALUES ('Perry', 'Jonathan', 'jonathan.perry1994@gmail.com', 'password', '3560 Country Square Dr', 'Carrollton', 75006);
-INSERT INTO Patrons(last_name, first_name, email, password, address, city, zipcode) VALUES ('Pinkerton', 'Mike', 'mike.pinkerton@gmail.com', 'password', '923 W Sycamore St', 'Denton', 76201);
+INSERT INTO Patrons(last_name, first_name, email, password, admin_permission, address, city, zipcode) VALUES ('Perry', 'Jonathan', 'jonathan.perry1994@gmail.com', 'password', 1, '3560 Country Square Dr', 'Carrollton', 75006);
+INSERT INTO Patrons(last_name, first_name, email, password, admin_permission, address, city, zipcode) VALUES ('Pinkerton', 'Mike', 'mike.pinkerton@gmail.com', 'password', 0, '923 W Sycamore St', 'Denton', 76201);
 /***********************
 * Genres Inserts
 ***********************/

@@ -24,12 +24,11 @@ router.get('/login', function(req, res){
 router.post('/login', function(req, res){
     console.log("IN LOGIN - POST");
     var mysql = req.app.get('mysql');
-    var sql = "SELECT * FROM Patrons WHERE email = ? AND password = ?;";
+    var sql = "SELECT * FROM Patrons WHERE email = ? AND password = ? LIMIT 1;";
     var inserts = [req.body.email, req.body.password]; 
     var redirect = "/books"; // Go to books page by default
     console.log(inserts);     
     sql = mysql.pool.query(sql,inserts,function(error, results, fields){
-        console.log(results);
         if(error){
             console.log(JSON.stringify(error))
             res.write(JSON.stringify(error));
@@ -40,19 +39,20 @@ router.post('/login', function(req, res){
                 res.redirect('/login');
             }
             else {
-                console.log(results);
-                // if(results[0].permission){ // admin user
-                //     req.session.admin = true;
-                //     req.session.normal_user = false;
-                // }else{ // normal user
-                //     req.session.normal_user = true;
-                //     req.session.admin = false;
-                //     req.session.user_id = results[0].id;
-                //     redirect = "/user"; // Go to user dashboard
-                //  }
-                req.session.fullname = results[0].first_name + ' ' + results[0].last_name;
-                console.log(`fullname - ${req.session.fullname}`);
-                req.flash("success", "Successfully logged in as " + req.session.fullname + ".");
+                console.log(`RESULTS: ${JSON.stringify(results)}`);
+                if(results[0].admin_permission){ // admin user
+                    req.session.admin = true;
+                    req.session.normal_user = false;
+                }else{ // normal user
+                    console.log("Normal user logged in");
+                    req.session.normal_user = true;
+                    req.session.admin = false;
+                    req.session.user_id = results[0].id;
+                    redirect = "/"; // Go to user dashboard
+                 }
+                req.session.username = results[0].first_name + ' ' + results[0].last_name;
+                console.log(`fullname - ${req.session.username}`);
+                req.flash("success", "Successfully logged in as " + req.session.username + ".");
                 res.redirect(redirect);
             }
         }
@@ -61,9 +61,7 @@ router.post('/login', function(req, res){
 // This route handles the process for logging a user out, where the request and response
 // objects are passed to the middleware.logout function, where all of the logic to handle
 // logging out is stored
-router.get("/logout", middleware.logout, function(req, res){
-
-})
+router.get("/logout", middleware.logout)
 // This route shows the forgot password form where the user can recover their password
 router.get("/forgot", function(req, res){
     console.log("Show forgot form");
