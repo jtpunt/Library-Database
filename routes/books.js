@@ -10,7 +10,7 @@ var express    = require("express"),
 
 router.route('/')
     // CREATE a book
-    .post(
+    .post(middleware.isAdmin,
         (req, res) =>{
             var context = {};
             var childCallCount = 0;
@@ -94,7 +94,7 @@ router.route('/')
         }
     )
     // RETRIEVE all books
-    .get(middleware.isLoggedIn,
+    .get(
         (req, res) => {
           	let callbackCount = 0,
                 mysql         = req.app.get('mysql'),
@@ -137,7 +137,7 @@ router.get('/filter',function(req,res){
         }
     }
 });
-router.get('/new',function(req,res){
+router.get('/new', middleware.isAdmin, function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
@@ -156,7 +156,7 @@ router.get('/new',function(req,res){
 });
 router.route('/:isbn')
     // CREATE a book loan by isbn 
-    .post(
+    .post(middleware.isAdmin,
         (req, res) =>{
             let context = {},
                 mysql   = req.app.get('mysql');
@@ -180,7 +180,7 @@ router.route('/:isbn')
         }
     )
     // updates a book by the isbn given in the URI parameter
-    .put(
+    .put(middleware.isAdmin,
         (req, res) => {
             let mysql          = req.app.get('mysql'),
                 inserts        = [req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.isbn],
@@ -197,7 +197,7 @@ router.route('/:isbn')
         }
     )
     // Delete a book by isbn
-    .delete(
+    .delete(middleware.isAdmin,
         (req, res) => {
             let mysql         = req.app.get('mysql'),
                 inserts       = [req.params.id],
@@ -213,7 +213,7 @@ router.route('/:isbn')
     );
 
 /* Display one book for the specific purpose of updating information in that book */
-router.get('/books/:isbn/edit', function(req,res){
+router.get('/books/:isbn/edit', middleware.isAdmin, function(req,res){
     let mysql          = req.app.get('mysql'),
         isbnParam      = req.params.isbn,
         getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
