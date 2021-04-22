@@ -111,7 +111,7 @@ router.route('/')
             function complete(){
                 callbackCount++;
                 if(callbackCount >= 5){
-                    res.render('books', context);
+                    res.render('books/index', context);
                 }
             }
         }
@@ -133,7 +133,7 @@ router.get('/filter',function(req,res){
     function complete(){
         callbackCount++;
         if(callbackCount >= 5){
-            res.render('books', context);
+            res.render('books/index', context);
         }
     }
 });
@@ -150,7 +150,7 @@ router.get('/new', middleware.isAdmin, function(req,res){
     function complete(){
         callbackCount++;
         if(callbackCount >= 3){
-            res.render('addBooks', context);
+            res.render('books/new', context);
         }
     }
 });
@@ -176,7 +176,8 @@ router.route('/:isbn')
     // Retrieve a book by isbn
     .get(
         (req, res) => {
-
+            res.render('books/show');
+            res.status(200).end();
         }
     )
     // updates a book by the isbn given in the URI parameter
@@ -213,7 +214,7 @@ router.route('/:isbn')
     );
 
 /* Display one book for the specific purpose of updating information in that book */
-router.get('/books/:isbn/edit', middleware.isAdmin, function(req,res){
+router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
     let mysql          = req.app.get('mysql'),
         isbnParam      = req.params.isbn,
         getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
@@ -221,13 +222,14 @@ router.get('/books/:isbn/edit', middleware.isAdmin, function(req,res){
             stylesheets: ["/static/css/addBooks.css"],
             scripts:  ["/static/js/updatebook.js"]
         };
+    console.log("Edit book route");
     mysql.pool.query(getBooksByISBN, isbnParam, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }else
             context.book = results[0];             
-            res.render('update-book', context);
+            res.render('books/edit', context);
     });
 });
 module.exports = router;
