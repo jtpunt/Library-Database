@@ -178,11 +178,22 @@ router.route('/:isbn')
         (req, res) => {
             let mysql          = req.app.get('mysql'),
                 isbnParam      = req.params.isbn,
-                getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
+                //getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
+                getBooksByISBN = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
+                (SELECT COUNT(bc.isbn) FROM Book_Copies bc WHERE b.isbn = bc.isbn) - \
+                (SELECT COUNT(bl.isbn) FROM Book_Loans bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
+                CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Books b \
+                INNER JOIN Publishers p ON b.publisher_id = p.publisher_id \
+                INNER JOIN Book_Genres bg ON b.isbn = bg.isbn \
+                INNER JOIN Genres g ON bg.genre_id = g.genre_id \
+                INNER JOIN Book_Authors ba ON b.isbn =  ba.isbn \
+                INNER JOIN Authors a ON ba.author_id = a.author_id \
+                WHERE b.isbn = ?;"
                 context        = {
                     stylesheets: ["/static/css/addBooks.css"],
                     scripts:  ["/static/js/updatebook.js"]
-                };
+                },
+                inserts = [isbnParam, isbnParam];
             console.log("Show book route");
             mysql.pool.query(getBooksByISBN, isbnParam, function(error, results, fields){
                 if(error){
