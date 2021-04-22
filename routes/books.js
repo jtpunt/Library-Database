@@ -176,8 +176,24 @@ router.route('/:isbn')
     // Retrieve a book by isbn
     .get(
         (req, res) => {
-            res.render('books/show');
-            res.status(200).end();
+            let mysql          = req.app.get('mysql'),
+                isbnParam      = req.params.isbn,
+                getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
+                context        = {
+                    stylesheets: ["/static/css/addBooks.css"],
+                    scripts:  ["/static/js/updatebook.js"]
+                };
+            console.log("Show book route");
+            mysql.pool.query(getBooksByISBN, isbnParam, function(error, results, fields){
+                if(error){
+                    console.log(`error: ${JSON.stringify(error)}`);
+                    res.write(JSON.stringify(error));
+                    res.end();
+                }else
+                    console.log(`results: ${JSON.stringify(results)}`);
+                    context.book = results[0];             
+                    res.render('books/show', context);
+            });
         }
     )
     // updates a book by the isbn given in the URI parameter

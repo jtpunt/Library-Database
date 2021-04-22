@@ -32,33 +32,35 @@
 </nav>
 <div id="maincontent" style="overflow: scroll;">
 <% Books.forEach(function(book){ %>
-    <div class="row" style="height: 27%; border: 1px solid #bdc3c7;"> 
-        <div class="thumbnail" style="float: left;">
-            <img src="<%=book.img_file_url%>">
-        </div>
-        <div style="float: left; margin-left: 1%; margin-top: 1%;">
-            <p>Title: <%=book.title%></p>
-            <p>Pages: <%=book.pages%></p>
-            <p>Author: <%=book.Author_Name%></p>
-            <p>Publisher Name: <%=book.publisher_name%></p>
-            <p>Genre: <%=book.genre_name%></p>
-            <p>Copies Available: <%=book.Copies_Available%></p>
-            <div class="popup" onclick="showPopup(this)">Click To View Description
-                <span class="popuptext"><%=book.description%></span>
+<div class="card mb-3">
+    <div class="row g-0" style=" border: 1px solid #bdc3c7;"> 
+        <div class="col-md-2">
+            <div class="thumbnail">
+                <img class="img-responsive" src="<%=book.img_file_url%>">
             </div>
         </div>
-        <div style="float: right;">
-            <h5>Check Out Book As Patron
-            <select id="<%=book.isbn%>" name="patron_id">
-                <% Patrons.forEach(function(patron){ %>
-                    <option value="<%=patron.patron_id%>"><%=patron.patron_name%></option>
-                <% }); %>
-            </select>
-            <button onclick="checkOutBook('<%=book.isbn%>')">Submit</button></h5>
-            <h5>Edit Book <button onclick="location.href='/books/<%=book.isbn%>/edit'">Update</a></h5>
-            <h5>Delete Book <button onclick="deleteFromDB('<%=book.isbn%>')">Submit</button></h5>
+        <div class="col-md-6">
+            <div lass="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Title: <%=book.title%></li>
+                    <li class="list-group-item">Pages: <%=book.pages%></li>
+                    <li class="list-group-item">Author: <%=book.Author_Name%></li>
+                    <li class="list-group-item">Publisher Name: <%=book.publisher_name%></li>
+                    <li class="list-group-item">Genre: <%=book.genre_name%></li>
+                    <li class="list-group-item">Copies Available: <%=book.Copies_Available%></li>
+                </ul>
+                <div class="popup" onclick="showPopup(this)">Click To View Description
+                    <span class="popuptext"><%=book.description%></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div lass="card-footer">
+                <h5>View Book <button onclick="location.href='/books/<%=book.isbn%>'">View</a></h5>
+            </div>
         </div>
     </div>
+</div>
 <% }); %>
 </div>
 <%- include ('../partials/footer') %>
