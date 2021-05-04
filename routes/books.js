@@ -246,7 +246,7 @@ router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
         isbnParam      = req.params.isbn,
         getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
         context        = {
-            stylesheets: ["/static/css/addBooks.css"],
+            stylesheets: [],
             scripts:  ["/static/js/updatebook.js"]
         };
     console.log("Edit book route");

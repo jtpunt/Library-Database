@@ -1,112 +1,105 @@
 <%- include ('../partials/header') %>
-<nav class="navbar navbar-inverse navbar-fixed" id="left-sidebar-wrapper" role="navigation">
-    <ul class="nav sidebar-nav">
-        <li class="sidebar-brand">
-            <h4 style="text-align: center;">Filter By</h4>
-        </li>
-    </ul>
-</nav>
 
-<div id="maincontent" style="overflow: scroll;">
-<div class="form-style-3">
-<form id="add-Book" action="/books" method="post">
-    <fieldset>
-        <legend>Add Book Details</legend>
-        <label for="isbn">
-            <span>ISBN-10<span class="required">*</span></span>
-            <p class="wrapper">
-                <input type="number" name="isbn" id="isbn" required>
-                <div id="isbnError" class="icon" hidden="false"></div>
-                <div id="isbnCheck" class="icon" hidden="true"></div>
-            </p>
-        </label>
-        <label for="title">
-            <span>Title Name<span class="required">*</span></span>
-            <input type="text" name="title" required>
-        </label>
-        <label for="desc">
-            <span>Description<span class="required">*</span></span>
-            <input type="text" name="desc" required>
-        </label>
-        <label for="pages">
-            <span>Pages<span class="required">*</span></span>
-            <input type="number" name="pages" required>
-        </label>
-        <label for="img_file_url">
-            <span>Image URL<span class="required">*</span></span>
-            <input type="text" name="img_file_url" required>
-        </label>
-        <label for="copies">
-            <span>Copies<span class="required">*</span></span>
-            <input type="number" name="copies" required>
-        </label>
-         <label for="author">
-            <span>Authors<span class="required">*</span></span>
-            <select name="author" class="mySelections" required>
-                <!-- <option value="">Pick a Author</option> -->
-                <% Authors.forEach(function(author){ %>
-                    <option value="<%=author.publisher_id%>"><%=author.author_name%></option>
-                <% }); %>
-                <!-- <option value="">Add New Author</option> -->
-            </select>
-        </label>
-        <label for="publisher">
-            <span>Publisher<span class="required">*</span></span>
-            <select name="publisher" class="mySelections" required>
-                <!-- <option value="">Pick a Publisher</option> -->
+<div class="container">
+    <div class="form-style-3">
+        <form id="add-Book" action="/books" method="post">
+            <fieldset>
+                <legend>Add Book Details</legend>
+                <label for="isbn">
+                    <span>ISBN-10<span class="required">*</span></span>
+                    <p class="wrapper">
+                        <input type="number" name="isbn" id="isbn" required>
+                        <div id="isbnError" class="icon" hidden="false"></div>
+                        <div id="isbnCheck" class="icon" hidden="true"></div>
+                    </p>
+                </label>
+                <label for="title">
+                    <span>Title Name<span class="required">*</span></span>
+                    <input type="text" name="title" required>
+                </label>
+                <label for="desc">
+                    <span>Description<span class="required">*</span></span>
+                    <input type="text" name="desc" required>
+                </label>
+                <label for="pages">
+                    <span>Pages<span class="required">*</span></span>
+                    <input type="number" name="pages" required>
+                </label>
+                <label for="img_file_url">
+                    <span>Image URL<span class="required">*</span></span>
+                    <input type="text" name="img_file_url" required>
+                </label>
+                <label for="copies">
+                    <span>Copies<span class="required">*</span></span>
+                    <input type="number" name="copies" required>
+                </label>
+                 <label for="author">
+                    <span>Authors<span class="required">*</span></span>
+                    <select name="author" class="mySelections" required>
+                        <!-- <option value="">Pick a Author</option> -->
+                        <% Authors.forEach(function(author){ %>
+                            <option value="<%=author.publisher_id%>"><%=author.author_name%></option>
+                        <% }); %>
+                        <!-- <option value="">Add New Author</option> -->
+                    </select>
+                </label>
+                <label for="publisher">
+                    <span>Publisher<span class="required">*</span></span>
+                    <select name="publisher" class="mySelections" required>
+                        <!-- <option value="">Pick a Publisher</option> -->
 
-                <% Publishers.forEach(function(publisher){ %>
-                    <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
-                <% }); %>
-                <!-- <option value="">Add New Publisher</option> -->
-            </select>
-        </label>
-        <label for="genre">
-            <span>Genres<span class="required">*</span></span>
-            <select name="genre" class="mySelections" required>
-                <!-- <option value="">Pick a Genre</option> -->
-                <% Genres.forEach(function(genre){ %>
-                    <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
-                <% }); %>
-                <!-- <option value="">Add New Genre</option> -->
-            </select>
-        </label> 
-    </fieldset>
-    <fieldset id="newAuthor" hidden="true">
-         <legend>Add New Author</legend>
-         <label for="author_fname">
-            <span>First Name<span class="required">*</span></span>
-            <input type="text" name="author_fname">
-         </label>
-         <label for="author_lname">
-            <span>Last Name<span class="required">*</span></span>
-            <input type="text" name="author_lname">
-         </label>
-    </fieldset>
-    <fieldset id="newPublisher" hidden="true">
-         <legend>Add New Publisher</legend>
-         <label for="publisher_name">
-            <span>Name<span class="required">*</span></span>
-            <input type="text" name="publisher_name">
-         </label>
-         <label for="city_name">
-            <span>City<span class="required">*</span></span>
-            <input type="text" name="city_name">
-         </label>
-         <label for="city_state">
-            <span>State<span class="required">*</span></span>
-            <input type="text" name="city_state"> 
-         </label>
-    </fieldset>
-     <fieldset id="newGenre" hidden="true">
-         <legend>Add New Genre</legend>
-         <label for="genre_name">
-            <span>Name<span class="required">*</span></span>
-            <input type="text" name="genre_name">
-         </label>
-    </fieldset>
-    <input type="submit" value="Submit">
-</form>
-</div>
+                        <% Publishers.forEach(function(publisher){ %>
+                            <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
+                        <% }); %>
+                        <!-- <option value="">Add New Publisher</option> -->
+                    </select>
+                </label>
+                <label for="genre">
+                    <span>Genres<span class="required">*</span></span>
+                    <select name="genre" class="mySelections" required>
+                        <!-- <option value="">Pick a Genre</option> -->
+                        <% Genres.forEach(function(genre){ %>
+                            <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
+                        <% }); %>
+                        <!-- <option value="">Add New Genre</option> -->
+                    </select>
+                </label> 
+            </fieldset>
+            <fieldset id="newAuthor" hidden="true">
+                 <legend>Add New Author</legend>
+                 <label for="author_fname">
+                    <span>First Name<span class="required">*</span></span>
+                    <input type="text" name="author_fname">
+                 </label>
+                 <label for="author_lname">
+                    <span>Last Name<span class="required">*</span></span>
+                    <input type="text" name="author_lname">
+                 </label>
+            </fieldset>
+            <fieldset id="newPublisher" hidden="true">
+                 <legend>Add New Publisher</legend>
+                 <label for="publisher_name">
+                    <span>Name<span class="required">*</span></span>
+                    <input type="text" name="publisher_name">
+                 </label>
+                 <label for="city_name">
+                    <span>City<span class="required">*</span></span>
+                    <input type="text" name="city_name">
+                 </label>
+                 <label for="city_state">
+                    <span>State<span class="required">*</span></span>
+                    <input type="text" name="city_state"> 
+                 </label>
+            </fieldset>
+             <fieldset id="newGenre" hidden="true">
+                 <legend>Add New Genre</legend>
+                 <label for="genre_name">
+                    <span>Name<span class="required">*</span></span>
+                    <input type="text" name="genre_name">
+                 </label>
+            </fieldset>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
 </div>
 <%- include ('../partials/footer') %>

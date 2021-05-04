@@ -1,5 +1,5 @@
 <%- include ('../partials/header') %>
-<div class="row">
+<!-- <div class="row">
 	<div class="col-md-6">
         <div class="thumbnail">
             <img class="img-responsive" src="<%=book.img_file_url%>">
@@ -18,6 +18,29 @@
     <div class="col-md-3">
         <h5>Edit Book <button onclick="location.href='/books/<%=book.isbn%>/edit'">Update</a></h5>
         <h5>Delete Book <button onclick="deleteFromDB('<%=book.isbn%>')">Submit</button></h5>
+    </div>
+</div> -->
+<div class="card mb-3">
+    <div class="row g-0">
+        <div class="col-md-6">
+            <div class="thumbnail">
+                <img class="img-responsive" src="<%=book.img_file_url%>">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <p class="lead"><%=book.title%></p>
+            <div class="list-group">
+                <li class="list-group-item">Pages: <%=book.pages%></li>
+                <li class="list-group-item">Author: <%=book.Author_Name%></li>
+                <li class="list-group-item">Publisher Name: <%=book.publisher_name%></li>
+                <li class="list-group-item">Genre: <%=book.genre_name%></li>
+                <li class="list-group-item">Copies Available: <%=book.Copies_Available%></li>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <h5>Edit Book <button onclick="location.href='/books/<%=book.isbn%>/edit'">Update</a></h5>
+            <h5>Delete Book <button onclick="deleteFromDB('<%=book.isbn%>')">Submit</button></h5>
+        </div>
     </div>
 </div>
 <%- include ('../partials/footer') %>
