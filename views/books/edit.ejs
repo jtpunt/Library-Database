@@ -1,7 +1,4 @@
 <%- include ('../partials/header') %>
-<div class="container">
-<div class="row">
-<div class="col-sm-12">
 <form id="update-book" action="/books/<%=book.isbn%>?_method=PUT" method="post">
     <legend>Edit Book Details for <%=book.title%></legend>
     <div class="form-group row">
@@ -36,7 +33,4 @@
     </div>
     <button>Update</button>
 </form>
-</div>
-</div>
-</div>
 <%- include ('../partials/footer') %>
