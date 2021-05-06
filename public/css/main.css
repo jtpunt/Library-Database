@@ -9,9 +9,6 @@
   border-radius: 0;
 }
 /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
-#content{
-	height: 1000px
-}
 .navbar-inverse .navbar-nav>li>a {
 	color: white;
 }
@@ -19,7 +16,7 @@
 	color: white;
 }
 /* Set black background color, white text and some padding */
-footer {
+nav, footer {
   background-color: yellow;
   color: black;
  	padding: 15px;
@@ -33,11 +30,11 @@ footer {
   }
   .row.content {height:auto;} 
 }
-body{
+/*body{
   padding-top: 70px;
-}
-.container-fluid {
+}*/
+/*.container-fluid {
   background-color: yellow;
   color: black;
 }
-.container-fluid>
+.container-fluid>*/

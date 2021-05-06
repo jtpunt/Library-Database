@@ -1,6 +1,6 @@
 
 #left-sidebar-wrapper{
-  width: 15%; 
+  /*width: 15%; */
   float: left; 
   border: 5px solid gray;
   background-color: #f1f1f1;
@@ -26,29 +26,23 @@
   height: 100%;
 }
 /* Style the buttons inside the tab */
-li.nav-item a  {
+/*li.nav-item a  {
     border: 1px solid #ccc;
     background-color: #f1f1f1;
     float: center;
     cursor: pointer;
     font-size: 17px;
     color: black;
-}
+}*/
 /* Change background color of a tag on hover */
-li.nav-item a:hover {
+/*li.nav-item a:hover {
   background-color: #3b77d6;
-}
+}*/
 /* Create an active/current a tag */
-li.nav-item a.active {
+/*li.nav-item a.active {
   background-color: #3b77d6;
-}
+}*/
 
-img {
-    border: 1px solid #ddd; /* Gray border */
-    border-radius: 4px;  /* Rounded border */
-    padding: 5px; /* Some padding */
-    width: 136px; /* Set a small width */
-}
 /*******************************************
 * Author: Jonathan Perry
 * Date: 12/03/17
