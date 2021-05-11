@@ -124,7 +124,6 @@ router.get('/filter',function(req,res){
             stylesheets: ["/static/css/books.css"],
             scripts:  ["/static/js/books.js"]
         };
-
     getBooksByFilter(res, mysql, context, req, complete);
     getPublishers(res, mysql, context, complete);
     getAuthors(res, mysql, context, complete);
@@ -438,14 +437,25 @@ function getBooksByFilter(res, mysql, context, req, complete){
     INNER JOIN Book_Authors ba ON b.isbn =  ba.isbn \
     INNER JOIN Authors a ON ba.author_id = a.author_id \
     GROUP BY b.isbn, Author_Name, a.author_id, g.genre_id, g.genre_name HAVING Copies_Available > 0 ";
+
     for(p in req.query){ 
         var table;
-        if(p === "publisher_id") table = "p."
-        else if(p === "genre_id") table = "g."
-        else table = "a."
-        sqlCommand += ("&& " + table + p + " = " + req.query[p] + " ");
+        console.log(`p - ${p}`);
+        // search by title, author, or publisher name
+        if(p === "wildcard"){
+            console.log(`wildcard: ${req.query[p]}`);
+            sqlCommand += ("&& " + "b.title" + " LIKE '" + req.query[p] + "%' ")
+            sqlCommand += ("|| " + "Author_Name" + " LIKE '" + req.query[p] + "%' ")
+            sqlCommand += ("|| " + "p.publisher_name" + " LIKE '" + req.query[p] + "%' ")
+        }else{ // search from publisher, genre or author drop down menus
+            if(p === "publisher_id")   table = "p."
+            else if(p === "genre_id")  table = "g."
+            else if(p === "author_id") table = "a."
+            sqlCommand += ("&& " + table + p + " = " + req.query[p] + " ");
+        }
     }
     sqlCommand += "ORDER BY b.title;";
+    console.log(`sqlCommand: ${sqlCommand}`);
     mysql.pool.query(sqlCommand, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));

@@ -1,72 +1,83 @@
 <%- include ('../partials/header') %>
-<div class="col-sm-2">
-    <nav class="navbar navbar-inverse navbar-fixed" id="left-sidebar-wrapper" role="navigation">
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-                <h4 style="text-align: center;">Filter By</h4>
-            </li>
-            <li class="list-group-item">
-                <form action="/books/filter" method="get">
-                    <label for="publisher_id">Filter By Publisher</label><br>
-                    <select name="publisher_id" class="mySelections">
-                        <% Publishers.forEach(function(publisher){ %>
-                            <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
-                        <% }); %>
-                    </select><button>Submit</button><br>
-                </form>
-            </li>
-            <li class="list-group-item">
-                <form action="/books/filter" method="get">
-                    <label for="author_id">Filter By Author</label><br>
-                    <select name="author_id" class="mySelections">
-                        <% Authors.forEach(function(author){ %>
-                            <option value="<%=author.publisher_id%>"><%=author.author_name%></option>
-                        <% }); %>
-                    </select><button>Submit</button>
-                </form>
-            </li>
-            <li class="list-group-item">
-                <form action="/books/filter" method="get">
-                    <label for="genre_id">Filter By Genres</label><br>
-                    <select name="genre_id" class="mySelections">
-                        <% Genres.forEach(function(genre){ %>
-                            <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
-                        <% }); %>
-                    </select><button>Submit</button><br>
-                </form>
-            </li>
-        </ul>
-    </nav>
-</div>
-<div class="col-sm-10">
-<% Books.forEach(function(book){ %>
-    <div class="card bg-light mb-3">
-        <div class="row no-gutters" style=" border: 1px solid #bdc3c7;"> 
-            <div class="col-sm-2">
-                <img class="card-img" src="<%=book.img_file_url%>">
-            </div>
-            <div class="col-sm-10">
-                <div lass="card-body">
-                    <div class="card-header"><%=book.title%></div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Pages: <%=book.pages%></li>
-                        <li class="list-group-item">Author: <%=book.Author_Name%></li>
-                        <li class="list-group-item">Publisher Name: <%=book.publisher_name%></li>
-                        <li class="list-group-item">Genre: <%=book.genre_name%></li>
-                        <li class="list-group-item">Copies Available: <%=book.Copies_Available%></li>
-                        <li class="list-group-item">
-                            <div class="popup" onclick="showPopup(this)">Click To View Description
-                                <span class="popuptext"><%=book.description%></span>
-                            </div>
-                        </li>
-                        <li class="list-group-item">
-                            <button class="btn btn-primary" onclick="location.href='/books/<%=book.isbn%>'">View</a>
-                        </li>
-                    </ul>
+<div class="row">
+    <div class="col-sm-3 mx-auto" id="left-sidebar-wrapper">
+        <!-- <nav class="navbar navbar-inverse navbar-fixed" id="left-sidebar-wrapper" role="navigation"> -->
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <h4 style="text-align: center;">Filter By</h4>
+                </li>
+                <li class="list-group-item">
+                    <form action="/books/filter" method="get"> 
+                        <label for="wildcard">Search by Title, Author, or Publisher Name</label>
+                        <input id="wildcard" name="wildcard" type="text" placeholder="Title, Author, or Publisher">
+                        <button>Submit</button>
+                    </form>
+                </li>
+                <li class="list-group-item">
+                    <form action="/books/filter" method="get">
+                        <label for="publisher_id">Filter By Publisher</label><br>
+                        <select name="publisher_id" class="mySelections">
+                            <% Publishers.forEach(function(publisher){ %>
+                                <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
+                            <% }); %>
+                        </select>
+                        <button>Submit</button>
+                    </form>
+                </li>
+                <li class="list-group-item">
+                    <form action="/books/filter" method="get">
+                        <label for="author_id">Filter By Author</label><br>
+                        <select name="author_id" class="mySelections">
+                            <% Authors.forEach(function(author){ %>
+                                <option value="<%=author.author_id%>"><%=author.author_name%></option>
+                            <% }); %>
+                        </select>
+                        <button>Submit</button>
+                    </form>
+                </li>
+                <li class="list-group-item">
+                    <form action="/books/filter" method="get">
+                        <label for="genre_id">Filter By Genres</label><br>
+                        <select name="genre_id" class="mySelections">
+                            <% Genres.forEach(function(genre){ %>
+                                <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
+                            <% }); %>
+                        </select><button>Submit</button><br>
+                    </form>
+                </li>
+            </ul>
+        <!-- </nav> -->
+    </div>
+    <div class="col-sm-9">
+    <% Books.forEach(function(book){ %>
+        <div class="card bg-light mb-3">
+            <div class="row no-gutters"> 
+                <div class="col-sm-2">
+                    <img class="card-img" src="<%=book.img_file_url%>">
+                </div>
+                <div class="col-sm-10">
+                    <div lass="card-body">
+                        <div class="card-header"><%=book.title%></div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Pages: <%=book.pages%></li>
+                            <li class="list-group-item">Author: <%=book.Author_Name%></li>
+                            <li class="list-group-item">Publisher Name: <%=book.publisher_name%></li>
+                            <li class="list-group-item">Genre: <%=book.genre_name%></li>
+                            <li class="list-group-item">Copies Available: <%=book.Copies_Available%></li>
+                            <li class="list-group-item">
+                                <div class="popup" onclick="showPopup(this)">Click To View Description
+                                    <span class="popuptext"><%=book.description%></span>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <button class="btn btn-primary" onclick="location.href='/books/<%=book.isbn%>'">View</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
+    <% }); %>
     </div>
-<% }); %>
 </div>
 <%- include ('../partials/footer') %>
