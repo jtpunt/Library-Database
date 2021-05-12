@@ -47,9 +47,9 @@ router.post('/login', function(req, res){
                     console.log("Normal user logged in");
                     req.session.normal_user = true;
                     req.session.admin = false;
-                    req.session.user_id = results[0].id;
                     redirect = "/"; // Go to user dashboard
-                 }
+                }
+                req.session.patron_id = results[0].patron_id;
                 req.session.username = results[0].first_name + ' ' + results[0].last_name;
                 console.log(`fullname - ${req.session.username}`);
                 req.flash("success", "Successfully logged in as " + req.session.username + ".");

@@ -16,8 +16,9 @@ var express = require('express'),
 	app = express();
 
 // Requiring routes
-var indexRoutes = require("./routes/index"),
-	bookRoutes  = require("./routes/books");
+var indexRoutes   = require("./routes/index"),
+	bookRoutes    = require("./routes/books"),
+    profileRoutes = require("./routes/profile");
 /**********************************************************************
 * Setup our handlebars engine for handling file extensions that end in
 * 'handlebars' by registering 'handlebars' as our view engine using its
@@ -50,6 +51,7 @@ app.use(function(req, res, next){
     res.locals.currentUser = req.session.username;
     res.locals.admin_user  = req.session.admin;
     res.locals.normal_user = req.session.normal_user;
+    res.locals.patron_id   = req.session.patron_id;
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     next();
@@ -59,6 +61,7 @@ app.use(function(req, res, next){
 **********************************************************************/
 app.use("/", indexRoutes);
 app.use("/books", bookRoutes);
+app.use("/profile", profileRoutes);
 app.use(function(req,res){
     res.status(404);
     res.render('404');

@@ -1,54 +1,52 @@
 <%- include ('../partials/header') %>
-<div class="row">
-    <div class="col-sm-3 mx-auto" id="left-sidebar-wrapper">
-        <!-- <nav class="navbar navbar-inverse navbar-fixed" id="left-sidebar-wrapper" role="navigation"> -->
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                    <h4 style="text-align: center;">Filter By</h4>
-                </li>
-                <li class="list-group-item">
-                    <form action="/books/filter" method="get"> 
-                        <label for="wildcard">Search by Title, Author, or Publisher Name</label>
-                        <input id="wildcard" name="wildcard" type="text" placeholder="Title, Author, or Publisher">
-                        <button>Submit</button>
-                    </form>
-                </li>
-                <li class="list-group-item">
-                    <form action="/books/filter" method="get">
-                        <label for="publisher_id">Filter By Publisher</label><br>
-                        <select name="publisher_id" class="mySelections">
-                            <% Publishers.forEach(function(publisher){ %>
-                                <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
-                            <% }); %>
-                        </select>
-                        <button>Submit</button>
-                    </form>
-                </li>
-                <li class="list-group-item">
-                    <form action="/books/filter" method="get">
-                        <label for="author_id">Filter By Author</label><br>
-                        <select name="author_id" class="mySelections">
-                            <% Authors.forEach(function(author){ %>
-                                <option value="<%=author.author_id%>"><%=author.author_name%></option>
-                            <% }); %>
-                        </select>
-                        <button>Submit</button>
-                    </form>
-                </li>
-                <li class="list-group-item">
-                    <form action="/books/filter" method="get">
-                        <label for="genre_id">Filter By Genres</label><br>
-                        <select name="genre_id" class="mySelections">
-                            <% Genres.forEach(function(genre){ %>
-                                <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
-                            <% }); %>
-                        </select><button>Submit</button><br>
-                    </form>
-                </li>
-            </ul>
-        <!-- </nav> -->
+<div class="row" style="max-height: 52em; overflow-y: scroll;">
+    <div class="col-sm-3" id="left-sidebar-wrapper">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <h4 style="text-align: center;">Filter By</h4>
+            </li>
+            <li class="list-group-item">
+                <form action="/books/filter" method="get"> 
+                    <label for="wildcard">Search by Title, Author, or Publisher Name</label>
+                    <input id="wildcard" name="wildcard" type="text" placeholder="Title, Author, or Publisher">
+                    <button>Submit</button>
+                </form>
+            </li>
+            <li class="list-group-item">
+                <form action="/books/filter" method="get">
+                    <label for="publisher_id">Filter By Publisher</label><br>
+                    <select name="publisher_id" class="mySelections">
+                        <% Publishers.forEach(function(publisher){ %>
+                            <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
+                        <% }); %>
+                    </select>
+                    <button>Submit</button>
+                </form>
+            </li>
+            <li class="list-group-item">
+                <form action="/books/filter" method="get">
+                    <label for="author_id">Filter By Author</label><br>
+                    <select name="author_id" class="mySelections">
+                        <% Authors.forEach(function(author){ %>
+                            <option value="<%=author.author_id%>"><%=author.author_name%></option>
+                        <% }); %>
+                    </select>
+                    <button>Submit</button>
+                </form>
+            </li>
+            <li class="list-group-item">
+                <form action="/books/filter" method="get">
+                    <label for="genre_id">Filter By Genres</label><br>
+                    <select name="genre_id" class="mySelections">
+                        <% Genres.forEach(function(genre){ %>
+                            <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
+                        <% }); %>
+                    </select><button>Submit</button><br>
+                </form>
+            </li>
+        </ul>
     </div>
-    <div class="col-sm-9">
+    <div class="col-sm-9" style="max-height: inherit; overflow-y: scroll;">
     <% Books.forEach(function(book){ %>
         <div class="card bg-light mb-3">
             <div class="row no-gutters"> 
