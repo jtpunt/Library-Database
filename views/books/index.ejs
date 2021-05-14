@@ -7,9 +7,23 @@
             </li>
             <li class="list-group-item">
                 <form action="/books/filter" method="get"> 
+                    <input type="checkbox" name="showAllBooksCb" id="showAllBooksCb" checked>
+                    <label for="flexCheckChecked">Show All Books</label>
+                    <button class="btn btn-info float-right">Submit</button>
+                </form>
+            </li>
+            <li class="list-group-item">
+                <form action="/books/filter" method="get"> 
+                    <input type="checkbox" value="" name="showAvailableBooksCb" id="showAvailableBooksCb" checked>
+                    <label for="flexCheckChecked">Show Available Books</label>
+                    <button class="btn btn-info float-right">Submit</button>
+                </form>
+            </li>
+            <li class="list-group-item">
+                <form action="/books/filter" method="get"> 
                     <label for="wildcard">Search by Title, Author, or Publisher Name</label>
                     <input id="wildcard" name="wildcard" type="text" placeholder="Title, Author, or Publisher">
-                    <button>Submit</button>
+                    <button class="btn btn-info float-right">Submit</button>
                 </form>
             </li>
             <li class="list-group-item">
@@ -20,7 +34,7 @@
                             <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
                         <% }); %>
                     </select>
-                    <button>Submit</button>
+                    <button class="btn btn-info float-right">Submit</button>
                 </form>
             </li>
             <li class="list-group-item">
@@ -31,7 +45,7 @@
                             <option value="<%=author.author_id%>"><%=author.author_name%></option>
                         <% }); %>
                     </select>
-                    <button>Submit</button>
+                    <button class="btn btn-info float-right">Submit</button>
                 </form>
             </li>
             <li class="list-group-item">
@@ -41,7 +55,8 @@
                         <% Genres.forEach(function(genre){ %>
                             <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
                         <% }); %>
-                    </select><button>Submit</button><br>
+                    </select>
+                    <button class="btn btn-info float-right">Submit</button>
                 </form>
             </li>
         </ul>

@@ -373,7 +373,7 @@ function getBooks(res, mysql, context, complete){
     INNER JOIN Genres g ON bg.genre_id = g.genre_id \
     INNER JOIN Book_Authors ba ON b.isbn =  ba.isbn \
     INNER JOIN Authors a ON ba.author_id = a.author_id \
-    GROUP BY b.isbn, Author_Name, g.genre_name HAVING Copies_Available > 0 \
+    GROUP BY b.isbn, Author_Name, g.genre_name HAVING Copies_Available >= 0 \
     ORDER BY b.title;";
     mysql.pool.query(getBooks, function(error, results, fields){
         if(error){
@@ -439,22 +439,31 @@ function getBooksByFilter(res, mysql, context, req, complete){
     INNER JOIN Genres g ON bg.genre_id = g.genre_id \
     INNER JOIN Book_Authors ba ON b.isbn =  ba.isbn \
     INNER JOIN Authors a ON ba.author_id = a.author_id \
-    GROUP BY b.isbn, Author_Name, a.author_id, g.genre_id, g.genre_name HAVING Copies_Available > 0 ";
-
+    GROUP BY b.isbn, Author_Name, a.author_id, g.genre_id, g.genre_name HAVING Copies_Available ";
+    console.log(`req.query: ${JSON.stringify(req.query)}`);
     for(p in req.query){ 
         var table;
         console.log(`p - ${p}`);
-        // search by title, author, or publisher name
-        if(p === "wildcard"){
-            console.log(`wildcard: ${req.query[p]}`);
-            sqlCommand += ("&& " + "b.title" + " LIKE '" + req.query[p] + "%' ")
-            sqlCommand += ("|| " + "Author_Name" + " LIKE '" + req.query[p] + "%' ")
-            sqlCommand += ("|| " + "p.publisher_name" + " LIKE '" + req.query[p] + "%' ")
-        }else{ // search from publisher, genre or author drop down menus
-            if(p === "publisher_id")   table = "p."
-            else if(p === "genre_id")  table = "g."
-            else if(p === "author_id") table = "a."
-            sqlCommand += ("&& " + table + p + " = " + req.query[p] + " ");
+        if(p === "showAllBooksCb"){
+            console.log("showAllBooksCb")
+            sqlCommand += " >= 0 "
+        }
+        else if( p === "showAvailableBooksCb"){
+            console.log("showAvailableBooksCb");
+            sqlCommand += " > 0 ";
+        }else{
+            // search by title, author, or publisher name
+            if(p === "wildcard"){
+                console.log(`wildcard: ${req.query[p]}`);
+                sqlCommand += ("&& " + "b.title" + " LIKE '" + req.query[p] + "%' ")
+                sqlCommand += ("|| " + "Author_Name" + " LIKE '" + req.query[p] + "%' ")
+                sqlCommand += ("|| " + "p.publisher_name" + " LIKE '" + req.query[p] + "%' ")
+            }else{ // search from publisher, genre or author drop down menus
+                if(p === "publisher_id")   table = "p."
+                else if(p === "genre_id")  table = "g."
+                else if(p === "author_id") table = "a."
+                sqlCommand += ("&& " + table + p + " = " + req.query[p] + " ");
+            }
         }
     }
     sqlCommand += "ORDER BY b.title;";
