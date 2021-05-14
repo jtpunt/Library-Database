@@ -92,7 +92,7 @@ CREATE TABLE Book_Loans(
   CONSTRAINT unique_Book_Loans UNIQUE(isbn, copy_number),
   PRIMARY KEY (isbn, copy_number),
   FOREIGN KEY (isbn) REFERENCES Books(isbn) ON DELETE CASCADE ON UPDATE CASCADE,
-  -- FOREIGN KEY (copy_number) REFERENCES Book_Copies(copy_number) ON DELETE CASCADE ON UPDATE CASCADE
+  -- FOREIGN KEY (copy_number) REFERENCES Book_Copies(copy_number) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (patron_id) REFERENCES Patrons(patron_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /***********************

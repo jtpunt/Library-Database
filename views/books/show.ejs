@@ -1,34 +1,45 @@
 <%- include ('../partials/header') %>
-<div class="col-sm-9 text-center mx-auto">
-    <div class="card mb-3">
-        <div class="row g-0">
-            <div class="col-md-6">
-                <div class="thumbnail">
-                    <img class="img-responsive" src="<%=book.img_file_url%>">
+<div class="row" style="max-height: 52em; overflow-y: scroll;">
+    <div class="col-sm-12 text-center mx-auto">
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-6">
+                    <div class="thumbnail">
+                        <img class="img-responsive" src="<%=book.img_file_url%>">
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div lass="card-body">
-                <div class="card-header"><%=book.title%></div>
-                <div class="list-group">
-                    <li class="list-group-item">Pages: <%=book.pages%></li>
-                    <li class="list-group-item">Author: <%=book.Author_Name%></li>
-                    <li class="list-group-item">Publisher Name: <%=book.publisher_name%></li>
-                    <li class="list-group-item">Genre: <%=book.genre_name%></li>
-                    <li class="list-group-item">Copies Available: <%=book.Copies_Available%></li>
-                    
+                <div class="col-md-3">
+                    <div lass="card-body">
+                        <div class="card-header"><%=book.title%></div>
+                        <div class="list-group">
+                            <li class="list-group-item">Pages: <%=book.pages%></li>
+                            <li class="list-group-item">Author: <%=book.Author_Name%></li>
+                            <li class="list-group-item">Publisher Name: <%=book.publisher_name%></li>
+                            <li class="list-group-item">Genre: <%=book.genre_name%></li>
+                            <li class="list-group-item">Copies Available: <%=book.Copies_Available%></li>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card-footer">
-                    <h5>Edit Book 
-                        <button class="btn btn-warning" onclick="location.href='/books/<%=book.isbn%>/edit'">Update</button>
-                    </h5>
-                    <h5>Delete Book 
-                        <button class="btn btn-danger" onclick="deleteFromDB('<%=book.isbn%>')">Submit</button>
-                    </h5>
-                </div>
+                <% if(currentUser){ %>
+                    <div class="col-md-3">
+                        <div class="card-footer">
+                            <div class="card-header">Actions</div>
+                            <div class="list-group">
+                               <li class="list-group-item">
+                                    <button class="btn btn-warning" onclick="checkOutBook('<%=book.isbn%>')">Checkout</button>
+                                </li>
+                                <% if(admin_user){ %>
+                                <li class="list-group-item">
+                                    <button class="btn btn-warning" onclick="location.href='/books/<%=book.isbn%>/edit'">Update</button>
+                                </li>
+                                <li class="list-group-item">
+                                    <button class="btn btn-danger" onclick="deleteFromDB('<%=book.isbn%>')">Delete</button>
+                                </li>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>

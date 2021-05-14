@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded',function() {
 function checkOutBook(isbn){
 	var myObj = {};
 	myObj.isbn = isbn;
-	myObj.patron_id = document.getElementById(isbn).value;
+    console.log(`in checkOutBook fn with isbn: ${isbn}`);
     $.ajax({
         url: '/books/' + isbn,
         type: 'post',

@@ -155,14 +155,15 @@ router.get('/new', middleware.isAdmin, function(req,res){
 });
 router.route('/:isbn')
     // CREATE a book loan by isbn 
-    .post(middleware.isAdmin,
+    .post(middleware.isLoggedIn,
         (req, res) =>{
             let context = {},
                 mysql   = req.app.get('mysql');
+            console.log(`in POST -> /${req.body.isbn}`);
             // this function returns an available copy number for the book that's being loaned out
             getAvailableCopy(res, mysql, [req.body.isbn, req.body.isbn], context, complete);
             function complete(){
-                var inserts = [req.body.isbn, context.Available, req.body.patron_id, '2017-12-01'];
+                var inserts = [req.body.isbn.toString(), context.Available, req.session.patron_id, '2017-12-01'];
                 insertBookLoan(res, mysql, inserts, finalComplete)
             }
             function finalComplete(){
@@ -190,7 +191,7 @@ router.route('/:isbn')
                 WHERE b.isbn = ?;"
                 context        = {
                     stylesheets: ["/static/css/addBooks.css"],
-                    scripts:  ["/static/js/updatebook.js"]
+                    scripts:  ["/static/js/books.js"]
                 },
                 inserts = [isbnParam, isbnParam];
             console.log("Show book route");
@@ -341,9 +342,11 @@ function insertBookLoan(res, mysql, inserts, complete){
     var setBookLoan = "INSERT INTO Book_Loans(isbn, copy_number, patron_id, return_date) VALUES (?, ?, ?, ?);";
     mysql.pool.query(setBookLoan, inserts, function(error, results, fields){
         if(error){
+            console.log(`error: ${JSON.stringify(error)}`);
             res.write(JSON.stringify(error));
             res.end();
         }
+        console.log(`results: ${JSON.stringify(results)}`)
         complete();
     });
 }
