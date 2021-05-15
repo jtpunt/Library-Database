@@ -30,45 +30,16 @@
                 <% Publishers.forEach(function(publisher){ %>
                     <a href="/books/filter?publisher_id=<%=publisher.publisher_id%>" class="btn btn-outline-secondary btn-sm" role="button" aria-pressed="true"><%=publisher.publisher_name%></a>
                 <% }); %>
-<!--                 <form action="/books/filter" method="get">
-                    <label for="publisher_id">Filter By Publisher</label>
-
-                    
-                    <select name="publisher_id" class="mySelections">
-                        <% Publishers.forEach(function(publisher){ %>
-                            <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
-                        <% }); %>
-                    </select>
-                    <button class="btn btn-info float-right">Submit</button>
-                </form> -->
             </li>
             <li class="list-group-item">
                 <% Authors.forEach(function(author){ %>
                     <a href="/books/filter?author_id=<%=author.author_id%>" class="btn btn-outline-secondary btn-sm" role="button" aria-pressed="true"><%=author.author_name%></a>
                 <% }); %>
-<!--                 <form action="/books/filter" method="get">
-                    <label for="author_id">Filter By Author</label><br>
-                    <select name="author_id" class="mySelections">
-                        <% Authors.forEach(function(author){ %>
-                            <option value="<%=author.author_id%>"><%=author.author_name%></option>
-                        <% }); %>
-                    </select>
-                    <button class="btn btn-info float-right">Submit</button>
-                </form> -->
             </li>
             <li class="list-group-item">
                 <% Genres.forEach(function(genre){ %>
                     <a href="/books/filter?genre_id=<%=genre.genre_id%>" class="btn btn-outline-secondary btn-sm" role="button" aria-pressed="true"><%=genre.genre_name%></a>
                 <% }); %>
-<!--                 <form action="/books/filter" method="get">
-                    <label for="genre_id">Filter By Genres</label><br>
-                    <select name="genre_id" class="mySelections">
-                        <% Genres.forEach(function(genre){ %>
-                            <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
-                        <% }); %>
-                    </select>
-                    <button class="btn btn-info float-right">Submit</button>
-                </form> -->
             </li>
         </ul>
     </div>

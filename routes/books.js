@@ -239,6 +239,19 @@ router.route('/:isbn')
             });
         }
     );
+router.route('/:isbn/checkout')
+    // Processes the book checkout for the user
+    .post(middleware.isLoggedIn,
+        (req, res) => {
+
+        }
+    )
+    // Retrieve the book's checkout page
+    .get(middleware.isLoggedIn,
+        (req, res) => {
+
+        }
+    )
 
 /* Display one book for the specific purpose of updating information in that book */
 router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
@@ -259,6 +272,10 @@ router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
             res.render('books/edit', context);
     });
 });
+
+router.get(`/:isbn/notify`, middleware.isLoggedIn, function(req, res){
+    
+})
 module.exports = router;
 
 function insertBook(res, mysql, inserts, complete){

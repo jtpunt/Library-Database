@@ -79,9 +79,7 @@
 <div class="row d-flex justify-content-around" style="max-height: 52em; overflow-y: scroll;"> 
     <div class="col-md-3">
         <div class="card">
-            <div class="thumbnail">
-                <img class="img-responsive" src="<%=book.img_file_url%>">
-            </div>
+            <img class="img-responsive" src="<%=book.img_file_url%>">
         </div>
     </div>
     <div class="col-md-3">
@@ -121,7 +119,7 @@
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between">
                         <div>Description:</div>
-                        <div class="text-right"><%=book.description%></div>
+                        <div class="text-truncate"><%=book.description%></div>
                     </div>
                 </li>
             </div>
@@ -132,16 +130,22 @@
             <div class="card bg-success">
                 <div class="card-header">Actions</div>
                 <div class="list-group">
-                   <li class="list-group-item">
-                        <button class="btn btn-warning" onclick="checkOutBook('<%=book.isbn%>')">Checkout</button>
-                    </li>
+                    <% if(book.Copies_Available === 0){ %>
+                        <li class="list-group-item">
+                            <button class="btn btn-warning">Notify when available</button>
+                        </li>
+                    <% }else{ %>
+                        <li class="list-group-item">
+                            <button class="btn btn-warning" onclick="checkOutBook('<%=book.isbn%>')">Checkout</button>
+                        </li>
+                    <% } %>
                     <% if(admin_user){ %>
-                    <li class="list-group-item">
-                        <button class="btn btn-warning" onclick="location.href='/books/<%=book.isbn%>/edit'">Update</button>
-                    </li>
-                    <li class="list-group-item">
-                        <button class="btn btn-danger" onclick="deleteFromDB('<%=book.isbn%>')">Delete</button>
-                    </li>
+                        <li class="list-group-item">
+                            <button class="btn btn-warning" onclick="location.href='/books/<%=book.isbn%>/edit'">Update</button>
+                        </li>
+                        <li class="list-group-item">
+                            <button class="btn btn-danger" onclick="deleteFromDB('<%=book.isbn%>')">Delete</button>
+                        </li>
                     <% } %>
                 </div>
             </div>
