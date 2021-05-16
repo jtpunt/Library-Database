@@ -99,8 +99,8 @@ router.route('/')
           	let callbackCount = 0,
                 mysql         = req.app.get('mysql'),
                 context       = {
-                    stylesheets: ["/static/css/Book.css"],
-                    scripts:  ["/static/js/Book.js"]
+                    stylesheets: ["/static/css/books.css"],
+                    scripts:  ["/static/js/books.js"]
                 }
             
             getBook(res, mysql, context, complete);
