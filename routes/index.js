@@ -24,9 +24,9 @@ router.get('/login', function(req, res){
 router.post('/login', function(req, res){
     console.log("IN LOGIN - POST");
     var mysql = req.app.get('mysql');
-    var sql = "SELECT * FROM Patrons WHERE email = ? AND password = ? LIMIT 1;";
+    var sql = "SELECT * FROM Patron WHERE email = ? AND password = ? LIMIT 1;";
     var inserts = [req.body.email, req.body.password]; 
-    var redirect = "/books"; // Go to books page by default
+    var redirect = "/book"; // Go to Book page by default
     console.log(inserts);     
     sql = mysql.pool.query(sql,inserts,function(error, results, fields){
         if(error){

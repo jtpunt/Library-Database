@@ -19,7 +19,7 @@ router.route('/')
             var flag = false; // false - we have parent table data to insert. true - we only have child table data to insert
             var mysql = req.app.get('mysql');
 
-            // insert data for parent tables (authors, genres, publishers), which has to be added into the database before other data is added in
+            // insert data for parent tables (authors, Genre, publishers), which has to be added into the database before other data is added in
             var newAuthorInserts = [req.body.author_lname, req.body.author_fname];
             var newGenreInserts = [req.body.genre_name];
             var newPublisherInserts = [req.body.publisher_name, req.body.city_name, req.body.city_state];
@@ -37,7 +37,7 @@ router.route('/')
             if(req.body.genre === "Add New Genre") parentCalls++;
             if(req.body.publisher === "Add New Publisher") parentCalls++;
 
-            // skip ahead to insert data into the Books table, Book_Authors, Book_Copies, and Book_Genre tables
+            // skip ahead to insert data into the Book table, Book_Author, Book_Copy, and Book_Genre tables
             if(req.body.author != "Add New Author" && req.body.genre != "Add New Genre" && req.body.publisher != "Add New Publisher") { 
                 flag = true;
                 parentComplete();
@@ -86,27 +86,27 @@ router.route('/')
                     function finalComplete(){
                         childCallCount++;
                         if(childCallCount >= 3){
-                            res.redirect('books');
+                            res.redirect('book');
                         }
                     }
                 }
             }
         }
     )
-    // RETRIEVE all books
+    // RETRIEVE all Book
     .get(
         (req, res) => {
           	let callbackCount = 0,
                 mysql         = req.app.get('mysql'),
                 context       = {
-                    stylesheets: ["/static/css/books.css"],
-                    scripts:  ["/static/js/books.js"]
+                    stylesheets: ["/static/css/Book.css"],
+                    scripts:  ["/static/js/Book.js"]
                 }
             
-            getBooks(res, mysql, context, complete);
+            getBook(res, mysql, context, complete);
             getPublishers(res, mysql, context, complete);
             getAuthors(res, mysql, context, complete);
-            getGenres(res, mysql, context, complete);
+            getGenre(res, mysql, context, complete);
             getPatrons(res, mysql, context, complete);
             function complete(){
                 callbackCount++;
@@ -121,13 +121,13 @@ router.get('/filter',function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
-            stylesheets: ["/static/css/books.css"],
-            scripts:  ["/static/js/books.js"]
+            stylesheets: ["/static/css/Book.css"],
+            scripts:  ["/static/js/Book.js"]
         };
-    getBooksByFilter(res, mysql, context, req, complete);
+    getBookByFilter(res, mysql, context, req, complete);
     getPublishers(res, mysql, context, complete);
     getAuthors(res, mysql, context, complete);
-    getGenres(res, mysql, context, complete);
+    getGenre(res, mysql, context, complete);
     getPatrons(res, mysql, context, complete);
     function complete(){
         callbackCount++;
@@ -140,14 +140,15 @@ router.get('/new', middleware.isAdmin, function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
-            stylesheets: ["/static/css/addBooks.css"],
-            scripts:  ["/static/js/addBooks.js"]
+            stylesheets: ["/static/css/addBook.css"],
+            scripts:  ["/static/js/addBook.js"]
         };
     getPublishers(res, mysql, context, complete);
     getAuthors(res, mysql, context, complete);
-    getGenres(res, mysql, context, complete);
+    getGenre(res, mysql, context, complete);
     function complete(){
         callbackCount++;
+        console.log("in complete");
         if(callbackCount >= 3){
             res.render('books/new', context);
         }
@@ -178,24 +179,24 @@ router.route('/:isbn')
         (req, res) => {
             let mysql          = req.app.get('mysql'),
                 isbnParam      = req.params.isbn,
-                //getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
-                getBooksByISBN = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
-                (SELECT COUNT(bc.isbn) FROM Book_Copies bc WHERE b.isbn = bc.isbn) - \
-                (SELECT COUNT(bl.isbn) FROM Book_Loans bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
-                CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Books b \
-                INNER JOIN Publishers p ON b.publisher_id = p.publisher_id \
-                INNER JOIN Book_Genres bg ON b.isbn = bg.isbn \
-                INNER JOIN Genres g ON bg.genre_id = g.genre_id \
-                INNER JOIN Book_Authors ba ON b.isbn =  ba.isbn \
-                INNER JOIN Authors a ON ba.author_id = a.author_id \
+                //getBookByISBN = "SELECT * FROM Book WHERE isbn = ?",
+                getBookByISBN = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
+                (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
+                (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
+                CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b \
+                INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
+                INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
+                INNER JOIN Genre g ON bg.genre_id = g.genre_id \
+                INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
+                INNER JOIN Author a ON ba.author_id = a.author_id \
                 WHERE b.isbn = ?;"
                 context        = {
-                    stylesheets: ["/static/css/addBooks.css"],
-                    scripts:  ["/static/js/books.js"]
+                    stylesheets: ["/static/css/addBook.css"],
+                    scripts:  ["/static/js/Book.js"]
                 },
                 inserts = [isbnParam, isbnParam];
             console.log("Show book route");
-            mysql.pool.query(getBooksByISBN, isbnParam, function(error, results, fields){
+            mysql.pool.query(getBookByISBN, isbnParam, function(error, results, fields){
                 if(error){
                     console.log(`error: ${JSON.stringify(error)}`);
                     res.write(JSON.stringify(error));
@@ -212,14 +213,14 @@ router.route('/:isbn')
         (req, res) => {
             let mysql          = req.app.get('mysql'),
                 inserts        = [req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.isbn],
-                editBookByISBN = "UPDATE Books SET title=?, description=?, pages=?, img_file_url=? WHERE isbn=?;";
+                editBookByISBN = "UPDATE Book SET title=?, description=?, pages=?, img_file_url=? WHERE isbn=?;";
             mysql.pool.query(editBookByISBN, inserts, function(error, results, fields){
                 if(error){
                     res.write(JSON.stringify(error));
                     res.end();
                 }else{
                     res.status(200);
-                    res.redirect("/books");
+                    res.redirect("/book");
                 }
             });
         }
@@ -229,7 +230,7 @@ router.route('/:isbn')
         (req, res) => {
             let mysql         = req.app.get('mysql'),
                 inserts       = [req.params.id],
-                delBookByISBN = "DELETE FROM Books WHERE isbn = ?";
+                delBookByISBN = "DELETE FROM Book WHERE isbn = ?";
             mysql.pool.query(delBookByISBN, req.body.isbn, function(error, results, fields){
                 if(error){
                     res.write(JSON.stringify(error));
@@ -257,13 +258,13 @@ router.route('/:isbn/checkout')
 router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
     let mysql          = req.app.get('mysql'),
         isbnParam      = req.params.isbn,
-        getBooksByISBN = "SELECT * FROM Books WHERE isbn = ?",
+        getBookByISBN = "SELECT * FROM Book WHERE isbn = ?",
         context        = {
             stylesheets: [],
             scripts:  ["/static/js/updatebook.js"]
         };
     console.log("Edit book route");
-    mysql.pool.query(getBooksByISBN, isbnParam, function(error, results, fields){
+    mysql.pool.query(getBookByISBN, isbnParam, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -279,7 +280,7 @@ router.get(`/:isbn/notify`, middleware.isLoggedIn, function(req, res){
 module.exports = router;
 
 function insertBook(res, mysql, inserts, complete){
-    var setNewBook = "INSERT INTO Books(isbn, title, description, pages, img_file_url, publisher_id) VALUES (?, ?, ?, ?, ?, ?);";
+    var setNewBook = "INSERT INTO Book(isbn, title, description, pages, img_file_url, publisher_id) VALUES (?, ?, ?, ?, ?, ?);";
     mysql.pool.query(setNewBook, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -289,7 +290,7 @@ function insertBook(res, mysql, inserts, complete){
     });
 }
 function insertAuthor(res, mysql, inserts, complete){
-    var setNewAuthor = "INSERT INTO Authors(last_name, first_name) VALUES (?, ?);";
+    var setNewAuthor = "INSERT INTO Author(last_name, first_name) VALUES (?, ?);";
     mysql.pool.query(setNewAuthor, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -299,7 +300,7 @@ function insertAuthor(res, mysql, inserts, complete){
     });
 }
 function insertGenre(res, mysql, inserts, complete){
-    var setNewGenre = "INSERT INTO Genres(genre_name) VALUES (?);";
+    var setNewGenre = "INSERT INTO Genre(genre_name) VALUES (?);";
     mysql.pool.query(setNewGenre, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -309,7 +310,7 @@ function insertGenre(res, mysql, inserts, complete){
     });
 }
 function insertPublisher(res, mysql, inserts, complete){
-    var setNewPublisher = "INSERT INTO Publishers(publisher_name, city, state) VALUES (?, ?, ?);";
+    var setNewPublisher = "INSERT INTO Publisher(publisher_name, city, state) VALUES (?, ?, ?);";
     mysql.pool.query(setNewPublisher, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -320,7 +321,7 @@ function insertPublisher(res, mysql, inserts, complete){
 
 }
 function insertBookAuthor(res, mysql, inserts, complete) {
-    var setBookAuthor = "INSERT INTO Book_Authors(isbn, author_id) VALUES (?, ?);";
+    var setBookAuthor = "INSERT INTO Book_Author(isbn, author_id) VALUES (?, ?);";
     mysql.pool.query(setBookAuthor, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -330,7 +331,7 @@ function insertBookAuthor(res, mysql, inserts, complete) {
     });
 }
 function insertBookGenre(res, mysql, inserts, complete){
-    var setBookGenre = "INSERT INTO Book_Genres(isbn, genre_id) VALUES (?, ?);";
+    var setBookGenre = "INSERT INTO Book_Genre(isbn, genre_id) VALUES (?, ?);";
     mysql.pool.query(setBookGenre, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -340,7 +341,7 @@ function insertBookGenre(res, mysql, inserts, complete){
     });
 }
 function insertBookCopies(res, mysql, inserts, complete){
-    var setBookCopy = "INSERT INTO Book_Copies(isbn, copy_number) VALUES (?, ?);";
+    var setBookCopy = "INSERT INTO Book_Copy(isbn, copy_number) VALUES (?, ?);";
     for(var i = 0; i < inserts[1]; i++){
         var newInserts = [inserts[0], i]; // isbn at index 0, current iteration as the current copy number
         mysql.pool.query(setBookCopy, newInserts, function(error, results, fields){
@@ -356,7 +357,7 @@ function insertBookLoan(res, mysql, inserts, complete){
     inserts.forEach(function(value){
         console.log(value);
     })
-    var setBookLoan = "INSERT INTO Book_Loans(isbn, copy_number, patron_id, return_date) VALUES (?, ?, ?, ?);";
+    var setBookLoan = "INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) VALUES (?, ?, ?, ?);";
     mysql.pool.query(setBookLoan, inserts, function(error, results, fields){
         if(error){
             console.log(`error: ${JSON.stringify(error)}`);
@@ -368,8 +369,8 @@ function insertBookLoan(res, mysql, inserts, complete){
     });
 }
 function getAvailableCopy(res, mysql, isbn, context, complete){
-    var getAvailableCopy = "SELECT MIN(bc.copy_number) AS Available_Copy FROM Book_Copies bc WHERE bc.isbn = ? && bc.copy_number NOT IN ( \
-    SELECT bl.copy_number FROM Book_Loans bl WHERE bl.isbn = ?);";
+    var getAvailableCopy = "SELECT MIN(bc.copy_number) AS Available_Copy FROM Book_Copy bc WHERE bc.isbn = ? && bc.copy_number NOT IN ( \
+    SELECT bl.copy_number FROM Book_Loan bl WHERE bl.isbn = ?);";
     mysql.pool.query(getAvailableCopy, isbn, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -380,30 +381,30 @@ function getAvailableCopy(res, mysql, isbn, context, complete){
         complete();
     });
 }
-function getBooks(res, mysql, context, complete){
-    var getBooks = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
-    (SELECT COUNT(bc.isbn) FROM Book_Copies bc WHERE b.isbn = bc.isbn) - \
-    (SELECT COUNT(bl.isbn) FROM Book_Loans bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
-    CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Books b \
-    INNER JOIN Publishers p ON b.publisher_id = p.publisher_id \
-    INNER JOIN Book_Genres bg ON b.isbn = bg.isbn \
-    INNER JOIN Genres g ON bg.genre_id = g.genre_id \
-    INNER JOIN Book_Authors ba ON b.isbn =  ba.isbn \
-    INNER JOIN Authors a ON ba.author_id = a.author_id \
+function getBook(res, mysql, context, complete){
+    var getBook = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
+    (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
+    (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
+    CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b \
+    INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
+    INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
+    INNER JOIN Genre g ON bg.genre_id = g.genre_id \
+    INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
+    INNER JOIN Author a ON ba.author_id = a.author_id \
     GROUP BY b.isbn, Author_Name, g.genre_name HAVING Copies_Available >= 0 \
     ORDER BY b.title;";
-    mysql.pool.query(getBooks, function(error, results, fields){
+    mysql.pool.query(getBook, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
         context.Books = results;
-        //appendImagePath(context.Books); // we need /static/images/ to be placed before the image file's name
+        //appendImagePath(context.Book); // we need /static/images/ to be placed before the image file's name
         complete();
     });
 }
 function getPublishers(res, mysql, context, complete){
-    var getPublishers = "SELECT DISTINCT publisher_id, publisher_name FROM Publishers ORDER BY publisher_name ASC;";
+    var getPublishers = "SELECT DISTINCT publisher_id, publisher_name FROM Publisher ORDER BY publisher_name ASC;";
     mysql.pool.query(getPublishers, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -414,7 +415,7 @@ function getPublishers(res, mysql, context, complete){
     });
 }
 function getAuthors(res, mysql, context, complete){
-    var getAuthors = "SELECT DISTINCT author_id, CONCAT(first_name, ' ', last_name) AS author_name FROM Authors ORDER BY author_name ASC;";
+    var getAuthors = "SELECT DISTINCT author_id, CONCAT(first_name, ' ', last_name) AS author_name FROM Author ORDER BY author_name ASC;";
     mysql.pool.query(getAuthors, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -425,7 +426,7 @@ function getAuthors(res, mysql, context, complete){
     });
 }
 function getPatrons(res, mysql, context, complete){
-    var getPatrons = "SELECT DISTINCT patron_id, CONCAT(first_name, ' ', last_name) AS patron_name FROM Patrons ORDER BY patron_name ASC;";
+    var getPatrons = "SELECT DISTINCT patron_id, CONCAT(first_name, ' ', last_name) AS patron_name FROM Patron ORDER BY patron_name ASC;";
     mysql.pool.query(getPatrons, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -435,9 +436,9 @@ function getPatrons(res, mysql, context, complete){
         complete();
     });
 }
-function getGenres(res, mysql, context, complete){
-    var getGenres = "SELECT DISTINCT genre_id, genre_name FROM Genres ORDER BY genre_name ASC;";
-    mysql.pool.query(getGenres, function(error, results, fields){
+function getGenre(res, mysql, context, complete){
+    var getGenre = "SELECT DISTINCT genre_id, genre_name FROM Genre ORDER BY genre_name ASC;";
+    mysql.pool.query(getGenre, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -446,27 +447,27 @@ function getGenres(res, mysql, context, complete){
         complete();
     });
 }
-function getBooksByFilter(res, mysql, context, req, complete){
+function getBookByFilter(res, mysql, context, req, complete){
     var sqlCommand = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, p.publisher_id,  \
-    (SELECT COUNT(bc.isbn) FROM Book_Copies bc WHERE b.isbn = bc.isbn) - \
-    (SELECT COUNT(bl.isbn) FROM Book_Loans bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
-    CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, a.author_id, g.genre_id, g.genre_name FROM Books b \
-    INNER JOIN Publishers p ON b.publisher_id = p.publisher_id \
-    INNER JOIN Book_Genres bg ON b.isbn = bg.isbn \
-    INNER JOIN Genres g ON bg.genre_id = g.genre_id \
-    INNER JOIN Book_Authors ba ON b.isbn =  ba.isbn \
-    INNER JOIN Authors a ON ba.author_id = a.author_id \
+    (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
+    (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
+    CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, a.author_id, g.genre_id, g.genre_name FROM Book b \
+    INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
+    INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
+    INNER JOIN Genre g ON bg.genre_id = g.genre_id \
+    INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
+    INNER JOIN Author a ON ba.author_id = a.author_id \
     GROUP BY b.isbn, Author_Name, a.author_id, g.genre_id, g.genre_name HAVING Copies_Available ";
     console.log(`req.query: ${JSON.stringify(req.query)}`);
     for(p in req.query){ 
         var table;
         console.log(`p - ${p}`);
-        if(p === "showAllBooksCb"){
-            console.log("showAllBooksCb")
+        if(p === "showAllBookCb"){
+            console.log("showAllBookCb")
             sqlCommand += " >= 0 "
         }
-        else if( p === "showAvailableBooksCb"){
-            console.log("showAvailableBooksCb");
+        else if( p === "showAvailableBookCb"){
+            console.log("showAvailableBookCb");
             sqlCommand += " > 0 ";
         }else{
             // search by title, author, or publisher name
@@ -495,7 +496,7 @@ function getBooksByFilter(res, mysql, context, req, complete){
     });
 }
 function getAuthorID(res, mysql, inserts, context, complete){
-    var getAuthorID = "SELECT author_id FROM Authors WHERE last_name = ? && first_name = ?";
+    var getAuthorID = "SELECT author_id FROM Author WHERE last_name = ? && first_name = ?";
     mysql.pool.query(getAuthorID, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -506,7 +507,7 @@ function getAuthorID(res, mysql, inserts, context, complete){
     });
 }
 function getGenreID(res, mysql, inserts, context, complete){
-    var getGenreID = "SELECT genre_id FROM Genres WHERE genre_name = ?";
+    var getGenreID = "SELECT genre_id FROM Genre WHERE genre_name = ?";
     mysql.pool.query(getGenreID, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
@@ -517,7 +518,7 @@ function getGenreID(res, mysql, inserts, context, complete){
     });
 }
 function getPublisherID(res, mysql, inserts, context, complete){
-    var getPublisherID = "SELECT publisher_id FROM Publishers WHERE publisher_name = ?;";
+    var getPublisherID = "SELECT publisher_id FROM Publisher WHERE publisher_name = ?;";
     mysql.pool.query(getPublisherID, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));

@@ -31,13 +31,13 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="nav navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/books" style="color: black">View Books
+                    <a class="nav-link" href="/book" style="color: black">View Books
                         <span class="sr-only">(current)</span>
                     </a>
                 </li>
                 <% if(currentUser && admin_user){ %>
                     <li class="nav-item">
-                        <a class="nav-link" href="/books/new" style="color: black">Add Books</a>
+                        <a class="nav-link" href="/book/new" style="color: black">Add Books</a>
                     </li>
                 <% } %>
                 <% if(error && error.length > 0){ %>

@@ -5,7 +5,7 @@
 *******************************************/
 function updateBook(isbn){
     $.ajax({
-        url: '/books/' + isbn,
+        url: '/book/' + isbn,
         type: 'PUT',
         data: $('#update-book').serialize(), // #update-book: this is our form. 
         // serialize() encodes a set of form elements as a string

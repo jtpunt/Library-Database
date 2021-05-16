@@ -14,7 +14,7 @@ router.route('/')
 		(req, res) => {
 			let context = {},
 			 	mysql 	= req.app.get('mysql'),
-			 	sql     = "SELECT * FROM Patrons WHERE patron_id = ? LIMIT 1;",
+			 	sql     = "SELECT * FROM Patron WHERE patron_id = ? LIMIT 1;",
 			 	inserts = [req.session.patron_id];
 			sql = mysql.pool.query(sql, inserts, function(error, results, fields){
 				if(error){
@@ -48,7 +48,7 @@ router.route('/')
 router.get('/:patron_id/edit', middleware.isLoggedIn, (req, res) => {
 	let context = {},
 	 	mysql 	= req.app.get('mysql'),
-	 	sql     = "SELECT * FROM Patrons WHERE patron_id = ? LIMIT 1;",
+	 	sql     = "SELECT * FROM Patron WHERE patron_id = ? LIMIT 1;",
 	 	inserts = [req.session.patron_id];
 	sql = mysql.pool.query(sql, inserts, function(error, results, fields){
 		if(error){

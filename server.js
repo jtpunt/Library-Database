@@ -60,7 +60,7 @@ app.use(function(req, res, next){
 * Setup Routes For Our Server
 **********************************************************************/
 app.use("/", indexRoutes);
-app.use("/books", bookRoutes);
+app.use("/book", bookRoutes);
 app.use("/profile", profileRoutes);
 app.use(function(req,res){
     res.status(404);
