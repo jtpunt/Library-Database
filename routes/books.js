@@ -121,8 +121,8 @@ router.get('/filter',function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
-            stylesheets: ["/static/css/Book.css"],
-            scripts:  ["/static/js/Book.js"]
+            stylesheets: ["/static/css/books.css"],
+            scripts:  ["/static/js/books.js"]
         };
     getBookByFilter(res, mysql, context, req, complete);
     getPublishers(res, mysql, context, complete);
@@ -140,8 +140,8 @@ router.get('/new', middleware.isAdmin, function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
-            stylesheets: ["/static/css/addBook.css"],
-            scripts:  ["/static/js/addBook.js"]
+            stylesheets: ["/static/css/addBooks.css"],
+            scripts:  ["/static/js/addBooks.js"]
         };
     getPublishers(res, mysql, context, complete);
     getAuthors(res, mysql, context, complete);
@@ -191,8 +191,8 @@ router.route('/:isbn')
                 INNER JOIN Author a ON ba.author_id = a.author_id \
                 WHERE b.isbn = ?;"
                 context        = {
-                    stylesheets: ["/static/css/addBook.css"],
-                    scripts:  ["/static/js/Book.js"]
+                    stylesheets: ["/static/css/addBooks.css"],
+                    scripts:  ["/static/js/books.js"]
                 },
                 inserts = [isbnParam, isbnParam];
             console.log("Show book route");
@@ -273,10 +273,19 @@ router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
             res.render('books/edit', context);
     });
 });
+router.route('/:isbn/reserve')
+    // Reserve a book
+    .post(middleware.isLoggedIn,
+        (req, res) => {
+            
+        }
+    )
+    // Delete a book reservation
+    .delete(middleware.isLoggedIn,
+        (req, res) => {
 
-router.get(`/:isbn/notify`, middleware.isLoggedIn, function(req, res){
-    
-})
+        }
+    )
 module.exports = router;
 
 function insertBook(res, mysql, inserts, complete){
@@ -461,13 +470,11 @@ function getBookByFilter(res, mysql, context, req, complete){
     console.log(`req.query: ${JSON.stringify(req.query)}`);
     for(p in req.query){ 
         var table;
-        console.log(`p - ${p}`);
-        if(p === "showAllBookCb"){
-            console.log("showAllBookCb")
+        console.log(`p - ${p} - type - ${typeof p}`);
+        if(p === "showAllBooksCb"){
             sqlCommand += " >= 0 "
         }
-        else if( p === "showAvailableBookCb"){
-            console.log("showAvailableBookCb");
+        else if( p === "showAvailableBooksCb"){
             sqlCommand += " > 0 ";
         }else{
             // search by title, author, or publisher name
