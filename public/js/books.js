@@ -19,7 +19,7 @@ function checkOutBook(isbn){
 	myObj.isbn = isbn;
     console.log(`in checkOutBook fn with isbn: ${isbn}`);
     $.ajax({
-        url: '/book/' + isbn,
+        url: `/book/${isbn}`,
         type: 'post',
         dataType: "text",
         data: JSON.stringify(myObj),
@@ -34,7 +34,7 @@ function deleteFromDB(isbn){
 	var myObj = {};
 	myObj.isbn = isbn;
     $.ajax({
-        url: '/book/' + isbn,
+        url: `/book/${isbn}`,
         type: 'delete',
         dataType: "text",
  		data: JSON.stringify(myObj),
@@ -44,6 +44,21 @@ function deleteFromDB(isbn){
             window.location.reload(true);
         }
     });
+}
+function reserveBook(isbn){
+    var myObj = {};
+    myObj.isbn = isbn;
+    $.ajax({
+        url: `/book/${isbn}/reserve`,
+        type: 'post',
+        dataType: "text",
+        data: JSON.stringify(myObj),
+        contentType: "application/json",
+        async:false,
+        success: function(result){
+            window.location.reload(true);
+        }
+    });   
 }
 function showPopup(event) {
 	var popup = event.children[0];

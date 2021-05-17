@@ -132,7 +132,7 @@
                 <div class="list-group">
                     <% if(book.Copies_Available === 0){ %>
                         <li class="list-group-item">
-                            <button class="btn btn-warning">Notify when available</button>
+                            <button class="btn btn-warning" onclick="reserveBook('<%=book.isbn%>')">Notify when available</button>
                         </li>
                     <% }else{ %>
                         <li class="list-group-item">
@@ -141,7 +141,7 @@
                     <% } %>
                     <% if(admin_user){ %>
                         <li class="list-group-item">
-                            <button class="btn btn-warning" onclick="location.href='/books/<%=book.isbn%>/edit'">Update</button>
+                            <button class="btn btn-warning" onclick="location.href='/book/<%=book.isbn%>/edit'">Update</button>
                         </li>
                         <li class="list-group-item">
                             <button class="btn btn-danger" onclick="deleteFromDB('<%=book.isbn%>')">Delete</button>
