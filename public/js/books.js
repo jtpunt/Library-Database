@@ -21,24 +21,18 @@ function checkOutBook(isbn){
     $.ajax({
         url: `/book/${isbn}`,
         type: 'post',
-        dataType: "text",
-        data: JSON.stringify(myObj),
-        contentType: "application/json",
         async:false,
     	success: function(result){
             window.location.reload(true);
         }
     });
 }
-function deleteFromDB(isbn){
+function deleteBook(isbn){
 	var myObj = {};
 	myObj.isbn = isbn;
     $.ajax({
         url: `/book/${isbn}`,
         type: 'delete',
-        dataType: "text",
- 		data: JSON.stringify(myObj),
-        contentType: "application/json",
         async:false,
         success: function(result){
             window.location.reload(true);
@@ -46,19 +40,26 @@ function deleteFromDB(isbn){
     });
 }
 function reserveBook(isbn){
-    var myObj = {};
-    myObj.isbn = isbn;
     $.ajax({
         url: `/book/${isbn}/reserve`,
         type: 'post',
-        dataType: "text",
-        data: JSON.stringify(myObj),
-        contentType: "application/json",
         async:false,
         success: function(result){
             window.location.reload(true);
         }
     });   
+}
+function deleteBookReservation(isbn){
+    var myObj = {};
+    myObj.isbn = isbn;
+    $.ajax({
+        url: `/book/${isbn}/reserve`,
+        type: 'delete',
+        async:false,
+        success: function(result){
+            window.location.reload(true);
+        }
+    }); 
 }
 function showPopup(event) {
 	var popup = event.children[0];

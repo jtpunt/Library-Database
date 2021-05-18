@@ -133,9 +133,8 @@
                     <% if(book.Copies_Available === 0){ %>
                         <% if(book.reserve_date){ %>
                             <li class="list-group-item">
-                                <button class="btn btn-warning">Remove Reservation</button>
+                                <button class="btn btn-warning" onclick="deleteBookReservation('<%=book.isbn%>')">Remove Reservation</button>
                                 Reserved on <%= book.reserve_date %>
-
                             </li>
                         <% }else{ %>
                             <li class="list-group-item">
@@ -152,7 +151,7 @@
                             <button class="btn btn-warning" onclick="location.href='/book/<%=book.isbn%>/edit'">Update</button>
                         </li>
                         <li class="list-group-item">
-                            <button class="btn btn-danger" onclick="deleteFromDB('<%=book.isbn%>')">Delete</button>
+                            <button class="btn btn-danger" onclick="deleteBook('<%=book.isbn%>')">Delete</button>
                         </li>
                     <% } %>
                 </div>

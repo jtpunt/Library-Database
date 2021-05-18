@@ -160,11 +160,11 @@ router.route('/:isbn')
         (req, res) =>{
             let context = {},
                 mysql   = req.app.get('mysql');
-            console.log(`in POST -> /${req.body.isbn}`);
+            console.log(`in POST -> /${req.params.isbn}`);
             // this function returns an available copy number for the book that's being loaned out
-            getAvailableCopy(res, mysql, [req.body.isbn, req.body.isbn], context, complete);
+            getAvailableCopy(res, mysql, [req.params.isbn, req.params.isbn], context, complete);
             function complete(){
-                var inserts = [req.body.isbn.toString(), context.Available, req.session.patron_id, '2017-12-01'];
+                var inserts = [req.params.isbn, context.Available, req.session.patron_id, '2017-12-01'];
                 insertBookLoan(res, mysql, inserts, finalComplete)
             }
             function finalComplete(){
@@ -304,7 +304,7 @@ router.route('/:isbn/reserve')
             console.log(`patron_id: ${req.session.patron_id}`);
             console.log(`req data: ${JSON.stringify(req.body)}`)
             let mysql        = req.app.get('mysql'),
-                isbn         = req.body['isbn'],
+                isbn         = req.params['isbn'],
                 patron_id    = req.session.patron_id,
                 reserve_date = new Date(),
                 inserts      = [isbn, patron_id, reserve_date], 
@@ -331,15 +331,35 @@ router.route('/:isbn/reserve')
 
         }
     )
-    .get(middleware.isLoggedIn,
-        (req, res) => {
-            console.log("is this book reserved?");
-            res.end();
-        }
-    )
     // Delete a book reservation
     .delete(middleware.isLoggedIn,
         (req, res) => {
+            console.log(`patron_id: ${req.session.patron_id}`);
+            console.log(`req data: ${JSON.stringify(req.body)}`)
+            let mysql        = req.app.get('mysql'),
+                isbn         = req.params['isbn'],
+                patron_id    = req.session.patron_id,
+                inserts      = [isbn, patron_id], 
+                sqlStatement = "DELETE FROM Book_Reservation WHERE isbn = ? AND patron_id = ?";
+
+            mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+                if(error){
+                    console.log(`error? - ${JSON.stringify(error)}`);
+                    req.flash("error", "You have already reserved this book");
+                    // res.write(JSON.stringify(error));
+                    res.end();
+                }else if(results.affectedRows === 0){
+                    console.log("no results found");
+                    res.end();
+                }
+                else{
+                    
+                    console.log(`results: ${JSON.stringify(results)}`);
+                    
+                    console.log(`fields: ${JSON.stringify(fields)}`);
+                    res.end();
+                }
+            });
 
         }
     )
