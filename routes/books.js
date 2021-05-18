@@ -178,6 +178,7 @@ router.route('/:isbn')
     .get(
         (req, res) => {
             let mysql          = req.app.get('mysql'),
+                patron_id      = req.session.patron_id,
                 isbnParam      = req.params.isbn,
                 //getBookByISBN = "SELECT * FROM Book WHERE isbn = ?",
                 getBookByISBN = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
@@ -201,10 +202,33 @@ router.route('/:isbn')
                     console.log(`error: ${JSON.stringify(error)}`);
                     res.write(JSON.stringify(error));
                     res.end();
-                }else
-                    console.log(`results: ${JSON.stringify(results)}`);
-                    context.book = results[0];             
-                    res.render('books/show', context);
+                }else{
+                    context.book = results[0]; 
+                    // console.log(`results: ${JSON.stringify(results)}`);
+                    if(patron_id){
+                        console.log(`patron: ${patron_id}`);
+                        let inserts      = [isbnParam, patron_id],
+                            sqlStatement = "SELECT reserve_date FROM Book_Reservation WHERE isbn = ? AND patron_id = ?;";
+                        mysql.pool.query(sqlStatement, inserts, function(error1, results1, fields1){
+                            if(error1){
+                                console.log(`error: ${JSON.stringify(error1)}`);
+                                res.write(JSON.stringify(error1));
+                                res.end();
+                            }else if(results1.length === 0){
+                                console.log(`no results: ${JSON.stringify(results1)}`);
+                            }
+                            else{
+                                console.log(`results: ${JSON.stringify(results1)}`);
+                                let date = new Date(results1[0]['reserve_date']),
+                                    reserve_date = (date.getMonth() + 1) + '/' + date.getDate() + '/' +  date.getFullYear();
+                                context.book.reserve_date = reserve_date;
+                            }
+                            res.render('books/show', context);
+                        });
+                    }else{            
+                        res.render('books/show', context);
+                    }
+                }
             });
         }
     )
@@ -277,7 +301,40 @@ router.route('/:isbn/reserve')
     // Reserve a book
     .post(middleware.isLoggedIn,
         (req, res) => {
-            
+            console.log(`patron_id: ${req.session.patron_id}`);
+            console.log(`req data: ${JSON.stringify(req.body)}`)
+            let mysql        = req.app.get('mysql'),
+                isbn         = req.body['isbn'],
+                patron_id    = req.session.patron_id,
+                reserve_date = new Date(),
+                inserts      = [isbn, patron_id, reserve_date], 
+                sqlStatement = "INSERT INTO Book_Reservation(isbn, patron_id, reserve_date) VALUES (?, ?, ?);";
+
+            mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+                if(error){
+                    console.log(`error? - ${JSON.stringify(error)}`);
+                    req.flash("error", "You have already reserved this book");
+                    // res.write(JSON.stringify(error));
+                    res.end();
+                }else if(results.affectedRows === 0){
+                    console.log("no results found");
+                    res.end();
+                }
+                else{
+                    
+                    console.log(`results: ${JSON.stringify(results)}`);
+                    
+                    console.log(`fields: ${JSON.stringify(fields)}`);
+                    res.end();
+                }
+            });
+
+        }
+    )
+    .get(middleware.isLoggedIn,
+        (req, res) => {
+            console.log("is this book reserved?");
+            res.end();
         }
     )
     // Delete a book reservation

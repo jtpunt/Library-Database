@@ -131,13 +131,17 @@
                 <div class="card-header">Actions</div>
                 <div class="list-group">
                     <% if(book.Copies_Available === 0){ %>
-                        <li class="list-group-item">
-                            <!-- <button class="btn btn-warning" onclick="reserveBook('<%=book.isbn%>')">Notify when available</button> -->
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
-                                <label class="form-check-label" for="flexSwitchCheckChecked">Checked switch checkbox input</label>
-                            </div>
-                        </li>
+                        <% if(book.reserve_date){ %>
+                            <li class="list-group-item">
+                                <button class="btn btn-warning">Remove Reservation</button>
+                                Reserved on <%= book.reserve_date %>
+
+                            </li>
+                        <% }else{ %>
+                            <li class="list-group-item">
+                                <button class="btn btn-warning" onclick="reserveBook('<%=book.isbn%>')">Notify when available</button>
+                            </li>
+                        <% } %>
                     <% }else{ %>
                         <li class="list-group-item">
                             <button class="btn btn-warning" onclick="checkOutBook('<%=book.isbn%>')">Checkout</button>
