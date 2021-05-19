@@ -1,0 +1,29 @@
+<%- include ('../partials/header') %>
+<div class="row">
+	<div class="col-md-9 mx-auto">
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">ISBN</th>
+					<th scope="col">Title</th>
+					<th scope="col">Date Reserved</th>
+					<th scope="col">Remove Hold</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% holds.forEach(function(hold){ %>
+					<tr>
+						<td scope="row"><%= hold.isbn %></td>
+						<td><%= hold.title %></td>
+						<td><%= hold.reserve_date %></td>
+						<td>
+                            <button class="btn btn-warning" onclick="deleteBookReservation('<%=hold.isbn%>')">Remove Reservation</button>
+						</td>
+					</tr>
+				<% }); %>
+			</tbody>
+		</table>
+
+	</div>
+</div>
+<%- include ('../partials/footer') %>
