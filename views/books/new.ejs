@@ -46,7 +46,7 @@
                 <div class="col-sm-10">
                     <select name="author" class="mySelections form-control" required>
                         <!-- <option value="">Pick a Author</option> -->
-                        <% Authors.forEach(function(author){ %>
+                        <% authors.forEach(function(author){ %>
                             <option value="<%=author.publisher_id%>"><%=author.author_name%></option>
                         <% }); %>
                         <!-- <option value="">Add New Author</option> -->
@@ -58,7 +58,7 @@
                 <div class="col-sm-10">
                     <select name="publisher" class="mySelections form-control" required>
                         <!-- <option value="">Pick a Publisher</option> -->
-                        <% Publishers.forEach(function(publisher){ %>
+                        <% publishers.forEach(function(publisher){ %>
                             <option value="<%=publisher.publisher_id%>"><%=publisher.publisher_name%></option>
                         <% }); %>
                         <!-- <option value="">Add New Publisher</option> -->
@@ -70,7 +70,7 @@
                 <div class="col-sm-10">
                     <select name="genre" class="mySelections form-control" required>
                         <!-- <option value="">Pick a Genre</option> -->
-                        <% Genres.forEach(function(genre){ %>
+                        <% genres.forEach(function(genre){ %>
                             <option value="<%=genre.genre_id%>"><%=genre.genre_name%></option>
                         <% }); %>
                         <!-- <option value="">Add New Genre</option> -->

@@ -56,10 +56,11 @@ router.route('/checkout')
 			},
 			 	mysql 	= req.app.get('mysql'),
 				inserts = [req.session.patron_id],
-				sqlStatement = "SELECT bl.isbn, b.title, bl.return_date \
-				FROM Book_Loan bl \
-				INNER JOIN Book b ON bl.isbn = b.isbn \
-				WHERE patron_id = ?;";
+				sqlStatement = 
+					"SELECT bl.isbn, b.title, b.img_file_url, bl.return_date \
+					FROM Book_Loan bl \
+					INNER JOIN Book b ON bl.isbn = b.isbn \
+					WHERE patron_id = ?;";
 
 			mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
                 if(error){
@@ -84,10 +85,11 @@ router.route('/holds')
 			},
 			 	mysql 	= req.app.get('mysql'),
 				inserts = [req.session.patron_id],
-                sqlStatement = "SELECT br.isbn, b.title, br.reserve_date \
-                FROM Book_Reservation br \
-                INNER JOIN Book b ON br.isbn = b.isbn \
-				WHERE patron_id = ?;";
+                sqlStatement = 
+                	"SELECT br.isbn, b.title, br.reserve_date \
+	                FROM Book_Reservation br \
+	                INNER JOIN Book b ON br.isbn = b.isbn \
+					WHERE patron_id = ?;";
 
 			mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
                 if(error){

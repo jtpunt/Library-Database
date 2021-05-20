@@ -99,9 +99,13 @@ router.route('/')
           	let callbackCount = 0,
                 mysql         = req.app.get('mysql'),
                 context       = {
+                    authors: [],
+                    books: [],
+                    genres: [],
+                    publishers: [],
+                    holds: [],
                     stylesheets: ["/static/css/books.css"],
                     scripts:  ["/static/js/books.js"],
-                    holds: []
                 },
                 numOfCallBacks = (req.session.patron_id ? 6 : 5);
 
@@ -109,11 +113,12 @@ router.route('/')
             console.log(`req.session.patron_id: ${req.session.patron_id}`);
             console.log(`ternary test: ${(req.session.patron_id ? 6 : 5)}`);
             
-            getBook(res, mysql, context, complete);
+            getBooks(res, mysql, context, complete);
             getPublishers(res, mysql, context, complete);
             getAuthors(res, mysql, context, complete);
             getGenre(res, mysql, context, complete);
             getPatrons(res, mysql, context, complete);
+            // if the patron is logged in, get all the books checked out by them
             if(req.session.patron_id){
                 let inserts = [req.session.patron_id];
                 getBooksCheckedOutByPatron(res, mysql, inserts, context, complete);
@@ -131,17 +136,29 @@ router.get('/filter',function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
+            authors: [],
+            books: [],
+            genres: [],
+            publishers: [],
+            holds: [],
             stylesheets: ["/static/css/books.css"],
-            scripts:  ["/static/js/books.js"]
-        };
+            scripts:  ["/static/js/books.js"],
+        },
+        numOfCallBacks = (req.session.patron_id ? 6 : 5);
+
     getBookByFilter(res, mysql, context, req, complete);
     getPublishers(res, mysql, context, complete);
     getAuthors(res, mysql, context, complete);
     getGenre(res, mysql, context, complete);
     getPatrons(res, mysql, context, complete);
+    // if the patron is logged in, get all the books checked out by them
+    if(req.session.patron_id){
+        let inserts = [req.session.patron_id];
+        getBooksCheckedOutByPatron(res, mysql, inserts, context, complete);
+    }
     function complete(){
         callbackCount++;
-        if(callbackCount >= 5){
+        if(callbackCount >= numOfCallBacks){
             res.render('books/index', context);
         }
     }
@@ -190,56 +207,39 @@ router.route('/:isbn')
             let mysql          = req.app.get('mysql'),
                 patron_id      = req.session.patron_id,
                 isbnParam      = req.params.isbn,
-                //getBookByISBN = "SELECT * FROM Book WHERE isbn = ?",
-                getBookByISBN = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
-                (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
-                (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
-                CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b \
-                INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
-                INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
-                INNER JOIN Genre g ON bg.genre_id = g.genre_id \
-                INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
-                INNER JOIN Author a ON ba.author_id = a.author_id \
-                WHERE b.isbn = ?;"
                 context        = {
                     stylesheets: ["/static/css/addBooks.css"],
                     scripts:  ["/static/js/books.js"]
-                },
-                inserts = [isbnParam, isbnParam];
+                };
             console.log("Show book route");
-            mysql.pool.query(getBookByISBN, isbnParam, function(error, results, fields){
-                if(error){
-                    console.log(`error: ${JSON.stringify(error)}`);
-                    res.write(JSON.stringify(error));
-                    res.end();
-                }else{
-                    context.book = results[0]; 
-                    // console.log(`results: ${JSON.stringify(results)}`);
-                    if(patron_id){
-                        console.log(`patron: ${patron_id}`);
-                        let inserts      = [isbnParam, patron_id],
-                            sqlStatement = "SELECT reserve_date FROM Book_Reservation WHERE isbn = ? AND patron_id = ?;";
-                        mysql.pool.query(sqlStatement, inserts, function(error1, results1, fields1){
-                            if(error1){
-                                console.log(`error: ${JSON.stringify(error1)}`);
-                                res.write(JSON.stringify(error1));
-                                res.end();
-                            }else if(results1.length === 0){
-                                console.log(`no results: ${JSON.stringify(results1)}`);
-                            }
-                            else{
-                                console.log(`results: ${JSON.stringify(results1)}`);
-                                let date = new Date(results1[0]['reserve_date']),
-                                    reserve_date = (date.getMonth() + 1) + '/' + date.getDate() + '/' +  date.getFullYear();
-                                context.book.reserve_date = reserve_date;
-                            }
-                            res.render('books/show', context);
-                        });
-                    }else{            
+
+            getBookByIsbn(req, mysql, context, complete);
+
+            function complete(){
+               if(patron_id){
+                    console.log(`patron: ${patron_id}`);
+                    let inserts      = [isbnParam, patron_id],
+                        sqlStatement = "SELECT reserve_date FROM Book_Reservation WHERE isbn = ? AND patron_id = ?;";
+                    mysql.pool.query(sqlStatement, inserts, function(error1, results1, fields1){
+                        if(error1){
+                            console.log(`error: ${JSON.stringify(error1)}`);
+                            res.write(JSON.stringify(error1));
+                            res.end();
+                        }else if(results1.length === 0){
+                            console.log(`no results: ${JSON.stringify(results1)}`);
+                        }
+                        else{
+                            console.log(`results: ${JSON.stringify(results1)}`);
+                            let date = new Date(results1[0]['reserve_date']),
+                                reserve_date = (date.getMonth() + 1) + '/' + date.getDate() + '/' +  date.getFullYear();
+                            context.book.reserve_date = reserve_date;
+                        }
                         res.render('books/show', context);
-                    }
+                    });
+                } else{            
+                    res.render('books/show', context);
                 }
-            });
+            }
         }
     )
     // updates a book by the isbn given in the URI parameter
@@ -464,24 +464,49 @@ function getAvailableCopy(res, mysql, isbn, context, complete){
         complete();
     });
 }
-function getBook(res, mysql, context, complete){
-    var getBook = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
-    (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
-    (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
-    CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b \
-    INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
-    INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
-    INNER JOIN Genre g ON bg.genre_id = g.genre_id \
-    INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
-    INNER JOIN Author a ON ba.author_id = a.author_id \
-    GROUP BY b.isbn, Author_Name, g.genre_name HAVING Copies_Available >= 0 \
-    ORDER BY b.title;";
+function getBookByIsbn(req, mysql, context, complete){
+    var isbnParam      = req.params.isbn,
+        getBookByISBN = 
+            "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
+            (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
+            (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
+            CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b \
+            INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
+            INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
+            INNER JOIN Genre g ON bg.genre_id = g.genre_id \
+            INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
+            INNER JOIN Author a ON ba.author_id = a.author_id \
+            WHERE b.isbn = ?;"
+    mysql.pool.query(getBookByISBN, isbnParam, function(error, results, fields){
+        if(error){
+            console.log(`error: ${JSON.stringify(error)}`);
+            res.write(JSON.stringify(error));
+            res.end();
+        }else{
+            context.book = results[0]; 
+            complete();
+        }
+    });
+}
+function getBooks(res, mysql, context, complete){
+    var getBook = 
+            "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
+            (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
+            (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
+            CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b \
+            INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
+            INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
+            INNER JOIN Genre g ON bg.genre_id = g.genre_id \
+            INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
+            INNER JOIN Author a ON ba.author_id = a.author_id \
+            GROUP BY b.isbn, Author_Name, g.genre_name HAVING Copies_Available >= 0 \
+            ORDER BY b.title;";
     mysql.pool.query(getBook, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.Books = results;
+        context.books = results;
         //appendImagePath(context.Book); // we need /static/images/ to be placed before the image file's name
         complete();
     });
@@ -493,7 +518,7 @@ function getPublishers(res, mysql, context, complete){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.Publishers = results;
+        context.publishers = results;
         complete();
     });
 }
@@ -504,7 +529,7 @@ function getAuthors(res, mysql, context, complete){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.Authors = results;
+        context.authors = results;
         complete();
     });
 }
@@ -515,7 +540,7 @@ function getPatrons(res, mysql, context, complete){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.Patrons = results;
+        context.patrons = results;
         complete();
     });
 }
@@ -526,21 +551,22 @@ function getGenre(res, mysql, context, complete){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.Genres = results;
+        context.genres = results;
         complete();
     });
 }
 function getBookByFilter(res, mysql, context, req, complete){
-    var sqlCommand = "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, p.publisher_id,  \
-    (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
-    (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
-    CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, a.author_id, g.genre_id, g.genre_name FROM Book b \
-    INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
-    INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
-    INNER JOIN Genre g ON bg.genre_id = g.genre_id \
-    INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
-    INNER JOIN Author a ON ba.author_id = a.author_id \
-    GROUP BY b.isbn, Author_Name, a.author_id, g.genre_id, g.genre_name HAVING Copies_Available ";
+    var sqlCommand = 
+            "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, p.publisher_id,  \
+            (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
+            (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
+            CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, a.author_id, g.genre_id, g.genre_name FROM Book b \
+            INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
+            INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
+            INNER JOIN Genre g ON bg.genre_id = g.genre_id \
+            INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
+            INNER JOIN Author a ON ba.author_id = a.author_id \
+            GROUP BY b.isbn, Author_Name, a.author_id, g.genre_id, g.genre_name HAVING Copies_Available ";
     console.log(`req.query: ${JSON.stringify(req.query)}`);
     for(p in req.query){ 
         var table;
@@ -572,7 +598,7 @@ function getBookByFilter(res, mysql, context, req, complete){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.Books = results;
+        context.books = results;
         complete();
     });
 }
@@ -610,11 +636,12 @@ function getPublisherID(res, mysql, inserts, context, complete){
     });
 }
 function getBooksCheckedOutByPatron(res, mysql, inserts, context, complete){
-    var sqlStatement = "SELECT bl.isbn, b.title, bl.return_date \
-        FROM Book_Loan bl \
-        INNER JOIN Book b ON bl.isbn = b.isbn \
-        WHERE patron_id = ?;";
-    console.log("Getting books checked out by patron");
+    var sqlStatement = 
+            "SELECT bl.isbn, b.title, b.img_file_url, DATE_FORMAT(bl.return_date, '%d/%m/%Y') AS return_date \
+            FROM Book_Loan bl \
+            INNER JOIN Book b ON bl.isbn = b.isbn \
+            WHERE patron_id = ?;";
+        console.log("Getting books checked out by patron");
     mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));

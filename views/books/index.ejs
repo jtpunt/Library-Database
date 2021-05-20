@@ -27,62 +27,88 @@
                 </form>
             </li>
             <li class="list-group-item">
-                <% Publishers.forEach(function(publisher){ %>
+                <% publishers.forEach(function(publisher){ %>
                     <a href="/book/filter?publisher_id=<%=publisher.publisher_id%>" class="btn btn-outline-secondary btn-sm" role="button" aria-pressed="true"><%=publisher.publisher_name%></a>
                 <% }); %>
             </li>
             <li class="list-group-item">
-                <% Authors.forEach(function(author){ %>
+                <% authors.forEach(function(author){ %>
                     <a href="/book/filter?author_id=<%=author.author_id%>" class="btn btn-outline-secondary btn-sm" role="button" aria-pressed="true"><%=author.author_name%></a>
                 <% }); %>
             </li>
             <li class="list-group-item">
-                <% Genres.forEach(function(genre){ %>
+                <% genres.forEach(function(genre){ %>
                     <a href="/book/filter?genre_id=<%=genre.genre_id%>" class="btn btn-outline-secondary btn-sm" role="button" aria-pressed="true"><%=genre.genre_name%></a>
                 <% }); %>
             </li>
         </ul>
     </div>
     <div class="col-lg-6">
-    <% Books.forEach(function(book){ %>
-        <div class="card bg-light mb-3">
-            <div class="row no-gutters"> 
-                <div class="col-sm-2">
-                    <img class="card-img" src="<%=book.img_file_url%>">
-                </div>
-                <div class="col-sm-10">
-                    <div lass="card-body">
-                        <div class="card-header"><%=book.title%></div>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Pages: <%=book.pages%></li>
-                            <li class="list-group-item">Author: <%=book.Author_Name%></li>
-                            <li class="list-group-item">Publisher Name: <%=book.publisher_name%></li>
-                            <li class="list-group-item">Genre: <%=book.genre_name%></li>
-                            <li class="list-group-item">Available: 
-                                <%=book.Copies_Available >= 1 ? "Yes" : "No" %>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="popup" onclick="showPopup(this)">Click To View Description
-                                    <span class="popuptext"><%=book.description%></span>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <button class="btn btn-primary" onclick="location.href='/book/<%=book.isbn%>'">View</a>
-                            </li>
-                        </ul>
+        <ul class="list-group list-group-flush">
+        <% books.forEach(function(book){ %>
+            <li class="list-group-item">
+                <div class="card bg-light mb-3">
+                    <div class="row g-0"> 
+                        <div class="col-sm-2">
+                            <img class="card-img" src="<%=book.img_file_url%>">
+                        </div>
+                        <div class="col-sm-10">
+                            <div lass="card-body">
+                                <div class="card-header"><%=book.title%></div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">Pages: <%=book.pages%></li>
+                                    <li class="list-group-item">Author: <%=book.Author_Name%></li>
+                                    <li class="list-group-item">Publisher Name: <%=book.publisher_name%></li>
+                                    <li class="list-group-item">Genre: <%=book.genre_name%></li>
+                                    <li class="list-group-item">Available: 
+                                        <%=book.Copies_Available >= 1 ? "Yes" : "No" %>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="popup" onclick="showPopup(this)">Click To View Description
+                                            <span class="popuptext"><%=book.description%></span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <button class="btn btn-primary" onclick="location.href='/book/<%=book.isbn%>'">View</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    <% }); %>
+            </li>
+        <% }); %>
+        </ul>
     </div>
-    <div class="col-lg-3" id="left-sidebar-wrapper">
-        <% if(holds){ %>
-            <h1><%= holds.length %></h1>
-        <% } else{ %>
-
-            <h1>No Holds</h1>
-        <% } %>
+    <div class="col-sm-3" id="left-sidebar-wrapper">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <h4 style="text-align: center;">Holds</h4>
+            </li>
+            <% holds.forEach(function(hold){ %>
+                <li class="list-group-item">
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-sm-4">
+                                <img class="card-img" src="<%=hold.img_file_url%>">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title"><%=hold.title%></h5>
+                                    <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p> -->
+                                    <p class="card-text">
+                                        <small class="text-muted">Return on <%=hold.return_date %></small>
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent border-success">
+                                    <button class="btn btn-warning">Remove Reservation</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            <% }); %>
+        <ul>
     </div>
 </div>
 <%- include ('../partials/footer') %>
