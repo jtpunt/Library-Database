@@ -100,17 +100,27 @@ router.route('/')
                 mysql         = req.app.get('mysql'),
                 context       = {
                     stylesheets: ["/static/css/books.css"],
-                    scripts:  ["/static/js/books.js"]
-                }
+                    scripts:  ["/static/js/books.js"],
+                    holds: []
+                },
+                numOfCallBacks = (req.session.patron_id ? 6 : 5);
+
+            console.log(`numOfCallBacks: ${numOfCallBacks}`);
+            console.log(`req.session.patron_id: ${req.session.patron_id}`);
+            console.log(`ternary test: ${(req.session.patron_id ? 6 : 5)}`);
             
             getBook(res, mysql, context, complete);
             getPublishers(res, mysql, context, complete);
             getAuthors(res, mysql, context, complete);
             getGenre(res, mysql, context, complete);
             getPatrons(res, mysql, context, complete);
+            if(req.session.patron_id){
+                let inserts = [req.session.patron_id];
+                getBooksCheckedOutByPatron(res, mysql, inserts, context, complete);
+            }
             function complete(){
                 callbackCount++;
-                if(callbackCount >= 5){
+                if(callbackCount >= numOfCallBacks){
                     res.render('books/index', context);
                 }
             }
@@ -264,19 +274,6 @@ router.route('/:isbn')
             });
         }
     );
-router.route('/:isbn/checkout')
-    // Processes the book checkout for the user
-    .post(middleware.isLoggedIn,
-        (req, res) => {
-
-        }
-    )
-    // Retrieve the book's checkout page
-    .get(middleware.isLoggedIn,
-        (req, res) => {
-
-        }
-    )
 
 /* Display one book for the specific purpose of updating information in that book */
 router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
@@ -609,6 +606,23 @@ function getPublisherID(res, mysql, inserts, context, complete){
             res.end();
         }
         context.publisher = results[0];
+        complete();
+    });
+}
+function getBooksCheckedOutByPatron(res, mysql, inserts, context, complete){
+    var sqlStatement = "SELECT bl.isbn, b.title, bl.return_date \
+        FROM Book_Loan bl \
+        INNER JOIN Book b ON bl.isbn = b.isbn \
+        WHERE patron_id = ?;";
+    console.log("Getting books checked out by patron");
+    mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+        if(error){
+            res.write(JSON.stringify(error));
+            res.end();
+        }
+        context.holds = results;
+        console.log(`hold found: ${JSON.stringify(results)}`);
+        //appendImagePath(context.Book); // we need /static/images/ to be placed before the image file's name
         complete();
     });
 }

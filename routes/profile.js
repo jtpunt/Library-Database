@@ -46,7 +46,35 @@ router.route('/')
 			res.redirect('/profile');
 		}
 	)
+// Showing books that the user has checked out
+router.route('/checkout')
+	.get(middleware.isLoggedIn,
+		(req, res) => {
+			console.log('in checkout');
+			let context = {
+				scripts:  ["/static/js/books.js"]
+			},
+			 	mysql 	= req.app.get('mysql'),
+				inserts = [req.session.patron_id],
+				sqlStatement = "SELECT bl.isbn, b.title, bl.return_date \
+				FROM Book_Loan bl \
+				INNER JOIN Book b ON bl.isbn = b.isbn \
+				WHERE patron_id = ?;";
 
+			mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+                if(error){
+                    console.log(`error: ${JSON.stringify(error)}`);
+                    res.write(JSON.stringify(error));
+                    res.end();
+                }else{
+                	console.log(`results: ${JSON.stringify(results)}`);
+                	context.holds = results;
+                	res.render('profile/checkout', context);
+                }
+			});
+			
+		}
+	)
 router.route('/holds')
 	.get(middleware.isLoggedIn,
 		(req, res) => {

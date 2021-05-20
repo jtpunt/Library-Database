@@ -43,7 +43,7 @@
             </li>
         </ul>
     </div>
-    <div class="col-lg-9">
+    <div class="col-lg-6">
     <% Books.forEach(function(book){ %>
         <div class="card bg-light mb-3">
             <div class="row no-gutters"> 
@@ -58,7 +58,9 @@
                             <li class="list-group-item">Author: <%=book.Author_Name%></li>
                             <li class="list-group-item">Publisher Name: <%=book.publisher_name%></li>
                             <li class="list-group-item">Genre: <%=book.genre_name%></li>
-                            <li class="list-group-item">Copies Available: <%=book.Copies_Available%></li>
+                            <li class="list-group-item">Available: 
+                                <%=book.Copies_Available >= 1 ? "Yes" : "No" %>
+                            </li>
                             <li class="list-group-item">
                                 <div class="popup" onclick="showPopup(this)">Click To View Description
                                     <span class="popuptext"><%=book.description%></span>
@@ -73,6 +75,14 @@
             </div>
         </div>
     <% }); %>
+    </div>
+    <div class="col-lg-3" id="left-sidebar-wrapper">
+        <% if(holds){ %>
+            <h1><%= holds.length %></h1>
+        <% } else{ %>
+
+            <h1>No Holds</h1>
+        <% } %>
     </div>
 </div>
 <%- include ('../partials/footer') %>
