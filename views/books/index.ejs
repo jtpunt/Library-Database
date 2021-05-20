@@ -1,4 +1,13 @@
 <%- include ('../partials/header') %>
+<div class="row" style="border: 2px solid black">
+    <div class="col-lg-9 mx-auto text-center">
+        <form class="d-flex" action="/book/filter" method="get"> 
+            <label for="wildcard">Search by Title, Author, or Publisher Name</label>
+            <input id="wildcard" class="form-control me-2" name="wildcard" type="search" placeholder="Title, Author, or Publisher">
+            <button class="btn btn-info float-end">Submit</button>
+        </form>
+    </div>
+</div>
 <div class="row" style="max-height: 60em; overflow-y: scroll;">
     <div class="col-lg-3" id="left-sidebar-wrapper">
         <ul class="list-group list-group-flush">
@@ -45,6 +54,7 @@
     </div>
     <div class="col-lg-6">
         <ul class="list-group list-group-flush">
+            <li class="list-group-item text-center"><h2><%= books.length %> results</h2></li>
         <% books.forEach(function(book){ %>
             <li class="list-group-item">
                 <div class="card bg-light mb-3">
