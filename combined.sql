@@ -19,7 +19,7 @@ DROP PROCEDURE IF EXISTS sp_get_author_by_id;
 DROP PROCEDURE IF EXISTS sp_get_genre_by_id;
 DROP PROCEDURE IF EXISTS sp_get_publisher_by_id;
 DROP PROCEDURE IF EXISTS sp_get_books_checked_out_by_patron_id;
-
+DROP PROCEDURE IF EXISTS sp_get_available_copy_num_by_isbn;
 
 CREATE TABLE Publisher(
   publisher_id   int          NOT NULL AUTO_INCREMENT,
@@ -399,4 +399,17 @@ BEGIN
     FROM Book_Loan bl 
     INNER JOIN Book b ON bl.isbn = b.isbn 
     WHERE patron_id = patron_id;
+END $$
+
+/* Get Available Copy Number by isbn*/
+DROP PROCEDURE IF EXISTS sp_get_available_copy_num_by_isbn;
+DELIMITER $$
+CREATE PROCEDURE `sp_get_available_copy_num_by_isbn`(
+    in isbn varchar(10)
+)
+BEGIN
+    SELECT MIN(bc.copy_number) AS Available_Copy 
+    FROM Book_Copy bc 
+    WHERE bc.isbn = isbn && bc.copy_number NOT IN (
+        SELECT bl.copy_number FROM Book_Loan bl WHERE bl.isbn = isbn);
 END $$

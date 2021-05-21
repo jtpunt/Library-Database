@@ -18,7 +18,7 @@ router.route('/')
             var parentCallCount = 0;
             var flag = false; // false - we have parent table data to insert. true - we only have child table data to insert
             var mysql = req.app.get('mysql');
-
+            console.log(`in post -> /books`);
             // insert data for parent tables (authors, Genre, publishers), which has to be added into the database before other data is added in
             var newAuthorInserts = [req.body.author_lname, req.body.author_fname];
             var newGenreInserts = [req.body.genre_name];
@@ -189,7 +189,7 @@ router.route('/:isbn')
                 mysql   = req.app.get('mysql');
             console.log(`in POST -> /${req.params.isbn}`);
             // this function returns an available copy number for the book that's being loaned out
-            getAvailableCopy(res, mysql, [req.params.isbn, req.params.isbn], context, complete);
+            getAvailableCopy(res, mysql, req.params.isbn, context, complete);
             function complete(){
                 var inserts = [req.params.isbn, context.Available, req.session.patron_id, '2017-12-01'];
                 insertBookLoan(res, mysql, inserts, finalComplete)
@@ -298,15 +298,14 @@ router.route('/:isbn/reserve')
     // Reserve a book
     .post(middleware.isLoggedIn,
         (req, res) => {
-            console.log(`patron_id: ${req.session.patron_id}`);
-            console.log(`req data: ${JSON.stringify(req.body)}`)
+            console.log(`reserve patron_id: ${req.session.patron_id}`);
             let mysql        = req.app.get('mysql'),
                 isbn         = req.params['isbn'],
                 patron_id    = req.session.patron_id,
                 reserve_date = new Date(),
                 inserts      = [isbn, patron_id, reserve_date], 
                 sqlStatement = "INSERT INTO Book_Reservation(isbn, patron_id, reserve_date) VALUES (?, ?, ?);";
-
+            console.log(`reserve inserts: ${inserts}`);
             mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
                 if(error){
                     console.log(`error? - ${JSON.stringify(error)}`);
@@ -331,8 +330,8 @@ router.route('/:isbn/reserve')
     // Delete a book reservation
     .delete(middleware.isLoggedIn,
         (req, res) => {
-            console.log(`patron_id: ${req.session.patron_id}`);
-            console.log(`req data: ${JSON.stringify(req.body)}`)
+            console.log(`reserve patron_id: ${req.session.patron_id}`);
+            console.log(`reserve req data: ${JSON.stringify(req.body)}`)
             let mysql        = req.app.get('mysql'),
                 isbn         = req.params['isbn'],
                 patron_id    = req.session.patron_id,
@@ -452,14 +451,13 @@ function insertBookLoan(res, mysql, inserts, complete){
     });
 }
 function getAvailableCopy(res, mysql, isbn, context, complete){
-    var getAvailableCopy = "SELECT MIN(bc.copy_number) AS Available_Copy FROM Book_Copy bc WHERE bc.isbn = ? && bc.copy_number NOT IN ( \
-    SELECT bl.copy_number FROM Book_Loan bl WHERE bl.isbn = ?);";
-    mysql.pool.query(getAvailableCopy, isbn, function(error, results, fields){
+    mysql.pool.query(`CALL sp_get_available_copy_num_by_isbn('${isbn}')`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.Available = results[0].Available_Copy;
+        console.log(`Available_Copy results: ${JSON.stringify(results[0][0])}`);
+        context.Available = results[0][0].Available_Copy;
         console.log("Got available copy. Returning");
         complete();
     });
