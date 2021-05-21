@@ -465,93 +465,70 @@ function getAvailableCopy(res, mysql, isbn, context, complete){
     });
 }
 function getBookByIsbn(req, mysql, context, complete){
-    var isbnParam      = req.params.isbn,
-        getBookByISBN = 
-            "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
-            (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
-            (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
-            CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b \
-            INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
-            INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
-            INNER JOIN Genre g ON bg.genre_id = g.genre_id \
-            INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
-            INNER JOIN Author a ON ba.author_id = a.author_id \
-            WHERE b.isbn = ?;"
-    mysql.pool.query(getBookByISBN, isbnParam, function(error, results, fields){
+    var isbnParam      = req.params.isbn;
+    mysql.pool.query(`CALL sp_get_book_by_isbn('${isbnParam}')`, function(error, results, fields){
         if(error){
             console.log(`error: ${JSON.stringify(error)}`);
             res.write(JSON.stringify(error));
             res.end();
         }else{
-            context.book = results[0]; 
+            console.log(`getBooksByIsbn results: ${JSON.stringify(results[0][0])}`);
+            context.book = results[0][0]; 
             complete();
         }
     });
 }
 function getBooks(res, mysql, context, complete){
-    var getBook = 
-            "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, \
-            (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
-            (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
-            CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b \
-            INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
-            INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
-            INNER JOIN Genre g ON bg.genre_id = g.genre_id \
-            INNER JOIN Book_Author ba ON b.isbn =  ba.isbn \
-            INNER JOIN Author a ON ba.author_id = a.author_id \
-            GROUP BY b.isbn, Author_Name, g.genre_name HAVING Copies_Available >= 0 \
-            ORDER BY b.title;";
-    mysql.pool.query(getBook, function(error, results, fields){
+    mysql.pool.query('CALL sp_get_books()', function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.books = results;
+        context.books = results[0];
         //appendImagePath(context.Book); // we need /static/images/ to be placed before the image file's name
         complete();
     });
 }
 function getPublishers(res, mysql, context, complete){
-    var getPublishers = "SELECT DISTINCT publisher_id, publisher_name FROM Publisher ORDER BY publisher_name ASC;";
-    mysql.pool.query(getPublishers, function(error, results, fields){
+    mysql.pool.query('CALL sp_get_publishers()', function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.publishers = results;
+        context.publishers = results[0];
         complete();
     });
 }
 function getAuthors(res, mysql, context, complete){
-    var getAuthors = "SELECT DISTINCT author_id, CONCAT(first_name, ' ', last_name) AS author_name FROM Author ORDER BY author_name ASC;";
-    mysql.pool.query(getAuthors, function(error, results, fields){
+    //var getAuthors = "SELECT DISTINCT author_id, CONCAT(first_name, ' ', last_name) AS author_name FROM Author ORDER BY author_name ASC;";
+    mysql.pool.query('CALL sp_get_authors()', function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.authors = results;
+        context.authors = results[0];
+        console.log(`author results: ${JSON.stringify(results)}`);
+
         complete();
     });
 }
 function getPatrons(res, mysql, context, complete){
-    var getPatrons = "SELECT DISTINCT patron_id, CONCAT(first_name, ' ', last_name) AS patron_name FROM Patron ORDER BY patron_name ASC;";
-    mysql.pool.query(getPatrons, function(error, results, fields){
+    mysql.pool.query('CALL sp_get_patrons()', function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.patrons = results;
+        context.patrons = results[0];
         complete();
     });
 }
 function getGenre(res, mysql, context, complete){
-    var getGenre = "SELECT DISTINCT genre_id, genre_name FROM Genre ORDER BY genre_name ASC;";
-    mysql.pool.query(getGenre, function(error, results, fields){
+    mysql.pool.query('CALL sp_get_genres()', function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.genres = results;
+        context.genres = results[0];
         complete();
     });
 }

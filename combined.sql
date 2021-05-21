@@ -9,6 +9,15 @@ DROP TABLE IF EXISTS `Publisher`;
 DROP TABLE IF EXISTS `Genre`;
 DROP TABLE IF EXISTS `Patron`;
 
+DROP PROCEDURE IF EXISTS sp_get_books;
+DROP PROCEDURE IF EXISTS sp_get_publishers;
+DROP PROCEDURE IF EXISTS sp_get_authors;
+DROP PROCEDURE IF EXISTS sp_get_patrons;
+DROP PROCEDURE IF EXISTS sp_get_genres;
+DROP PROCEDURE IF EXISTS sp_get_book_by_isbn;
+DROP PROCEDURE IF EXISTS sp_get_author_by_id;
+DROP PROCEDURE IF EXISTS sp_get_genre_by_id;
+
 CREATE TABLE Publisher(
   publisher_id   int          NOT NULL AUTO_INCREMENT,
   publisher_name varchar(255) NOT NULL,
@@ -276,3 +285,114 @@ INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) VALUES('0553448
 );
 
 
+/* 
+* Stored Procedures
+*/
+
+/* Get Books Procedure */
+DELIMITER $$
+
+CREATE PROCEDURE `sp_get_books`()
+BEGIN
+  SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name,
+  (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) -
+  (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available,
+  CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b
+  INNER JOIN Publisher p ON b.publisher_id = p.publisher_id 
+  INNER JOIN Book_Genre bg ON b.isbn = bg.isbn 
+  INNER JOIN Genre g ON bg.genre_id = g.genre_id 
+  INNER JOIN Book_Author ba ON b.isbn =  ba.isbn 
+  INNER JOIN Author a ON ba.author_id = a.author_id 
+  GROUP BY b.isbn, Author_Name, g.genre_name HAVING Copies_Available >= 0 
+  ORDER BY b.title;
+END $$
+
+/* Get Publishers Procedure */
+
+DELIMITER $$
+
+CREATE PROCEDURE `sp_get_publishers`()
+BEGIN
+  SELECT DISTINCT publisher_id, publisher_name FROM Publisher ORDER BY publisher_name ASC;
+END $$
+
+/* Get Authors Procedure */
+
+DELIMITER $$
+
+CREATE PROCEDURE `sp_get_authors`()
+BEGIN
+  SELECT DISTINCT author_id, CONCAT(first_name, ' ', last_name) AS author_name FROM Author ORDER BY author_name ASC;
+END $$
+
+/* Get Patrons Procedure */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_patrons`()
+BEGIN
+  SELECT DISTINCT patron_id, CONCAT(first_name, ' ', last_name) AS patron_name FROM Patron ORDER BY patron_name ASC;
+END $$
+
+/* Get Genres Procedure */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_genres`()
+BEGIN
+  SELECT DISTINCT genre_id, genre_name FROM Genre ORDER BY genre_name ASC;
+END $$
+
+/* Get Book By ISBN Procedure */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_book_by_isbn`(
+    in isbn varchar(10)
+)
+BEGIN
+    SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, 
+    (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - 
+    (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, 
+    CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b 
+    INNER JOIN Publisher p ON b.publisher_id = p.publisher_id 
+    INNER JOIN Book_Genre bg ON b.isbn = bg.isbn 
+    INNER JOIN Genre g ON bg.genre_id = g.genre_id 
+    INNER JOIN Book_Author ba ON b.isbn =  ba.isbn 
+    INNER JOIN Author a ON ba.author_id = a.author_id 
+    WHERE b.isbn = isbn;
+END $$
+
+/* Get Author By Author ID Procedure */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_author_by_id`(
+    in last_name varchar(255),
+    in first_name varchar(255)
+)
+BEGIN
+    SELECT author_id FROM Author WHERE last_name = last_name && first_name = first_name;
+END $$
+
+/* Get Genre By Genre ID Procedure */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_genre_by_id`(
+    in genre_name varchar(255)
+)
+BEGIN
+    SELECT genre_id FROM Genre WHERE genre_name = genre_name;
+END $$
+
+/* Get Publisher By publisher ID Procedure */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_publisher_by_id`(
+    in publisher_name varchar(255)
+)
+BEGIN
+    SELECT publisher_id FROM Publisher WHERE publisher_name = publisher_name;
+END $$
+
+/* Get Books Checked Out By Patron ID Procedure */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_books_checked_out_by_patron_id`(
+    in patron_id int
+)
+BEGIN
+    SELECT bl.isbn, b.title, b.img_file_url, DATE_FORMAT(bl.return_date, '%d/%m/%Y') AS return_date 
+    FROM Book_Loan bl 
+    INNER JOIN Book b ON bl.isbn = b.isbn 
+    WHERE patron_id = patron_id;
+END $$
