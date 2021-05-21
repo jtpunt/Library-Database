@@ -472,7 +472,8 @@ function getBookByIsbn(req, mysql, context, complete){
             res.write(JSON.stringify(error));
             res.end();
         }else{
-            console.log(`getBooksByIsbn results: ${JSON.stringify(results[0][0])}`);
+            console.log(`getBookByISBN results: ${JSON.stringify(results)}`);
+            //console.log(`getBooksByIsbn results: ${JSON.stringify(results[0][0])}`);
             context.book = results[0][0]; 
             complete();
         }
@@ -580,8 +581,7 @@ function getBookByFilter(res, mysql, context, req, complete){
     });
 }
 function getAuthorID(res, mysql, inserts, context, complete){
-    var getAuthorID = "SELECT author_id FROM Author WHERE last_name = ? && first_name = ?";
-    mysql.pool.query(getAuthorID, inserts, function(error, results, fields){
+    mysql.pool.query(`CALL sp_get_author_by_name(${inserts[0]}, ${inserts[1]})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -591,8 +591,7 @@ function getAuthorID(res, mysql, inserts, context, complete){
     });
 }
 function getGenreID(res, mysql, inserts, context, complete){
-    var getGenreID = "SELECT genre_id FROM Genre WHERE genre_name = ?";
-    mysql.pool.query(getGenreID, inserts, function(error, results, fields){
+    mysql.pool.query(`CALL sp_get_genre_by_id(${inserts[0]})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -602,8 +601,7 @@ function getGenreID(res, mysql, inserts, context, complete){
     });
 }
 function getPublisherID(res, mysql, inserts, context, complete){
-    var getPublisherID = "SELECT publisher_id FROM Publisher WHERE publisher_name = ?;";
-    mysql.pool.query(getPublisherID, inserts, function(error, results, fields){
+    mysql.pool.query(`CALL sp_get_publisher_by_id(${inserts[0]})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -613,19 +611,13 @@ function getPublisherID(res, mysql, inserts, context, complete){
     });
 }
 function getBooksCheckedOutByPatron(res, mysql, inserts, context, complete){
-    var sqlStatement = 
-            "SELECT bl.isbn, b.title, b.img_file_url, DATE_FORMAT(bl.return_date, '%d/%m/%Y') AS return_date \
-            FROM Book_Loan bl \
-            INNER JOIN Book b ON bl.isbn = b.isbn \
-            WHERE patron_id = ?;";
-        console.log("Getting books checked out by patron");
-    mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+    mysql.pool.query(`CALL sp_get_books_checked_out_by_patron_id(${inserts[0]})`, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
-        context.holds = results;
-        console.log(`hold found: ${JSON.stringify(results)}`);
+        context.holds = results[0];
+        console.log(`hold found: ${JSON.stringify(results[0])}`);
         //appendImagePath(context.Book); // we need /static/images/ to be placed before the image file's name
         complete();
     });

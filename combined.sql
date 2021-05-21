@@ -17,6 +17,9 @@ DROP PROCEDURE IF EXISTS sp_get_genres;
 DROP PROCEDURE IF EXISTS sp_get_book_by_isbn;
 DROP PROCEDURE IF EXISTS sp_get_author_by_id;
 DROP PROCEDURE IF EXISTS sp_get_genre_by_id;
+DROP PROCEDURE IF EXISTS sp_get_publisher_by_id;
+DROP PROCEDURE IF EXISTS sp_get_books_checked_out_by_patron_id;
+
 
 CREATE TABLE Publisher(
   publisher_id   int          NOT NULL AUTO_INCREMENT,
@@ -340,6 +343,7 @@ BEGIN
 END $$
 
 /* Get Book By ISBN Procedure */
+DROP PROCEDURE IF EXISTS sp_get_book_by_isbn;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_book_by_isbn`(
     in isbn varchar(10)
@@ -359,7 +363,7 @@ END $$
 
 /* Get Author By Author ID Procedure */
 DELIMITER $$
-CREATE PROCEDURE `sp_get_author_by_id`(
+CREATE PROCEDURE `sp_get_author_by_name`(
     in last_name varchar(255),
     in first_name varchar(255)
 )
