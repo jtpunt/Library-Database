@@ -579,7 +579,7 @@ function getBookByFilter(res, mysql, context, req, complete){
     });
 }
 function getAuthorID(res, mysql, inserts, context, complete){
-    mysql.pool.query(`CALL sp_get_author_by_name(${inserts[0]}, ${inserts[1]})`, function(error, results, fields){
+    mysql.pool.query(`CALL sp_get_author_by_full_name(${inserts[0]}, ${inserts[1]})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -589,7 +589,7 @@ function getAuthorID(res, mysql, inserts, context, complete){
     });
 }
 function getGenreID(res, mysql, inserts, context, complete){
-    mysql.pool.query(`CALL sp_get_genre_by_id(${inserts[0]})`, function(error, results, fields){
+    mysql.pool.query(`CALL sp_get_genre_by_name(${inserts[0]})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -599,7 +599,7 @@ function getGenreID(res, mysql, inserts, context, complete){
     });
 }
 function getPublisherID(res, mysql, inserts, context, complete){
-    mysql.pool.query(`CALL sp_get_publisher_by_id(${inserts[0]})`, function(error, results, fields){
+    mysql.pool.query(`CALL sp_get_publisher_by_name(${inserts[0]})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -609,7 +609,7 @@ function getPublisherID(res, mysql, inserts, context, complete){
     });
 }
 function getBooksCheckedOutByPatron(res, mysql, inserts, context, complete){
-    mysql.pool.query(`CALL sp_get_books_checked_out_by_patron_id(${inserts[0]})`, inserts, function(error, results, fields){
+    mysql.pool.query(`CALL sp_get_books_checked_out_by_patron_id(${inserts[0]})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();

@@ -15,9 +15,9 @@
 					<tr>
 						<td scope="row"><%= hold.isbn %></td>
 						<td><%= hold.title %></td>
-						<td><%= hold.reserve_date %></td>
+						<td><%= hold.return_date %></td>
 						<td>
-                            <button class="btn btn-warning" onclick="deleteBookReservation('<%=hold.isbn%>')">Remove Reservation</button>
+                            <button class="btn btn-warning" >Remove Hold</button>
 						</td>
 					</tr>
 				<% }); %>

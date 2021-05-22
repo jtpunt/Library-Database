@@ -46,37 +46,32 @@ router.route('/')
 			res.redirect('/profile');
 		}
 	)
-// Showing books that the user has checked out
-router.route('/checkout')
+// Showing books that the user has placed on hold
+router.route('/holds')
 	.get(middleware.isLoggedIn,
 		(req, res) => {
 			console.log('in checkout');
 			let context = {
 				scripts:  ["/static/js/books.js"]
 			},
-			 	mysql 	= req.app.get('mysql'),
-				inserts = [req.session.patron_id],
-				sqlStatement = 
-					"SELECT bl.isbn, b.title, b.img_file_url, bl.return_date \
-					FROM Book_Loan bl \
-					INNER JOIN Book b ON bl.isbn = b.isbn \
-					WHERE patron_id = ?;";
+			 	mysql 	  = req.app.get('mysql'),
+				patron_id = req.session.patron_id;
 
-			mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+			mysql.pool.query(`CALL sp_get_books_checked_out_by_patron_id(${patron_id})`, function(error, results, fields){
                 if(error){
                     console.log(`error: ${JSON.stringify(error)}`);
                     res.write(JSON.stringify(error));
                     res.end();
                 }else{
                 	console.log(`results: ${JSON.stringify(results)}`);
-                	context.holds = results;
-                	res.render('profile/checkout', context);
+                	context.holds = results[0];
+                	res.render('profile/hold', context);
                 }
 			});
 			
 		}
 	)
-router.route('/holds')
+router.route('/reservations')
 	.get(middleware.isLoggedIn,
 		(req, res) => {
 			console.log('in holds');
@@ -84,22 +79,17 @@ router.route('/holds')
 				scripts:  ["/static/js/books.js"]
 			},
 			 	mysql 	= req.app.get('mysql'),
-				inserts = [req.session.patron_id],
-                sqlStatement = 
-                	"SELECT br.isbn, b.title, br.reserve_date \
-	                FROM Book_Reservation br \
-	                INNER JOIN Book b ON br.isbn = b.isbn \
-					WHERE patron_id = ?;";
+			 	patron_id = req.session.patron_id;
 
-			mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+			mysql.pool.query(`CALL sp_get_books_reserved_by_patron_id(${patron_id})`, function(error, results, fields){
                 if(error){
                     console.log(`error: ${JSON.stringify(error)}`);
                     res.write(JSON.stringify(error));
                     res.end();
                 }else{
                 	console.log(`results: ${JSON.stringify(results)}`);
-                	context.holds = results;
-                	res.render('profile/hold', context);
+                	context.holds = results[0];
+                	res.render('profile/reservation', context);
                 }
 			});
 			
