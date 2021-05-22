@@ -46,6 +46,13 @@ router.route('/')
 			res.redirect('/profile');
 		}
 	)
+	// DELETE a profile
+	.delete(middleware.isLoggedIn,
+		(req, res) => {
+			res.end();
+		}
+
+	)
 // Showing books that the user has placed on hold
 router.route('/holds')
 	.get(middleware.isLoggedIn,

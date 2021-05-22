@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded',function() {
 		mySelections[i].add(option, mySelections[i][0]); // add the option to the beginning of the current select tag
 	}
 });
-function checkOutBook(isbn){
+function holdBook(isbn){
 	var myObj = {};
 	myObj.isbn = isbn;
     console.log(`in checkOutBook fn with isbn: ${isbn}`);
@@ -32,6 +32,18 @@ function deleteBook(isbn){
 	myObj.isbn = isbn;
     $.ajax({
         url: `/book/${isbn}`,
+        type: 'delete',
+        async:false,
+        success: function(result){
+            window.location.reload(true);
+        }
+    });
+}
+function deleteBookHold(isbn){
+    var myObj = {};
+    myObj.isbn = isbn;
+    $.ajax({
+        url: `/book/${isbn}/hold`,
         type: 'delete',
         async:false,
         success: function(result){

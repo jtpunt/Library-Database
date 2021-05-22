@@ -359,6 +359,11 @@ router.route('/:isbn/reserve')
 
         }
     )
+
+router.delete('/:isbn/hold', middleware.isLoggedIn, function(req,res){
+    console.log(`in DELETE -> /${req.params.isbn}/hold`);
+    res.end();
+});
 module.exports = router;
 
 function insertBook(res, mysql, inserts, complete){
