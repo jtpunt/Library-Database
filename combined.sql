@@ -23,6 +23,7 @@ DROP PROCEDURE IF EXISTS sp_get_publisher_by_name;
 DROP PROCEDURE IF EXISTS sp_get_books_checked_out_by_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_books_reserved_by_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_available_copy_num_by_isbn;
+DROP PROCEDURE IF EXISTS sp_get_patron_by_email_and_pass;
 
 /* Insert Data Procedures */
 DROP PROCEDURE IF EXISTS sp_insert_book;
@@ -448,6 +449,19 @@ BEGIN
         SELECT bl.copy_number FROM Book_Loan bl WHERE bl.isbn = isbn);
 END $$
 
+/* Get Patron by email and password */
+DROP PROCEDURE IF EXISTS sp_get_patron_by_email_and_pass;
+DELIMITER $$
+CREATE PROCEDURE `sp_get_patron_by_email_and_pass`(
+    in email    varchar(255),
+    in password varchar(10)
+)
+BEGIN
+    SELECT * 
+    FROM Patron 
+    WHERE email = email AND password = password 
+    LIMIT 1;
+END $$
 
 /* Insert Book Data */
 DROP PROCEDURE IF EXISTS sp_insert_book;

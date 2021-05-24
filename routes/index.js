@@ -28,7 +28,7 @@ router.post('/login', function(req, res){
     var inserts = [req.body.email, req.body.password]; 
     var redirect = "/book"; // Go to Book page by default
     console.log(inserts);     
-    sql = mysql.pool.query(sql,inserts,function(error, results, fields){
+    sql = mysql.pool.query(`CALL sp_get_patron_by_email_and_pass('${req.body.email}', '${req.body.password}')`, function(error, results, fields){
         if(error){
             console.log(JSON.stringify(error))
             res.write(JSON.stringify(error));
@@ -40,7 +40,7 @@ router.post('/login', function(req, res){
             }
             else {
                 console.log(`RESULTS: ${JSON.stringify(results)}`);
-                if(results[0].admin_permission){ // admin user
+                if(results[0][0].admin_permission){ // admin user
                     req.session.admin = true;
                     req.session.normal_user = false;
                 }else{ // normal user
@@ -49,8 +49,8 @@ router.post('/login', function(req, res){
                     req.session.admin = false;
                     redirect = "/"; // Go to user dashboard
                 }
-                req.session.patron_id = results[0].patron_id;
-                req.session.username = results[0].first_name + ' ' + results[0].last_name;
+                req.session.patron_id = results[0][0].patron_id;
+                req.session.username = results[0][0].first_name + ' ' + results[0][0].last_name;
                 console.log(`fullname - ${req.session.username}`);
                 req.flash("success", "Successfully logged in as " + req.session.username + ".");
                 res.redirect(redirect);
