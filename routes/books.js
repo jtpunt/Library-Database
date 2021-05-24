@@ -367,8 +367,8 @@ router.delete('/:isbn/hold', middleware.isLoggedIn, function(req,res){
 module.exports = router;
 
 function insertBook(res, mysql, inserts, complete){
-    var setNewBook = "INSERT INTO Book(isbn, title, description, pages, img_file_url, publisher_id) VALUES (?, ?, ?, ?, ?, ?);";
-    mysql.pool.query(setNewBook, inserts, function(error, results, fields){
+    //var setNewBook = "INSERT INTO Book(isbn, title, description, pages, img_file_url, publisher_id) VALUES (?, ?, ?, ?, ?, ?);";
+    mysql.pool.query(`CALL sp_insert_book(${...inserts})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -377,8 +377,8 @@ function insertBook(res, mysql, inserts, complete){
     });
 }
 function insertAuthor(res, mysql, inserts, complete){
-    var setNewAuthor = "INSERT INTO Author(last_name, first_name) VALUES (?, ?);";
-    mysql.pool.query(setNewAuthor, inserts, function(error, results, fields){
+    // var setNewAuthor = "INSERT INTO Author(last_name, first_name) VALUES (?, ?);";
+    mysql.pool.query(`CALL sp_insert_author(${...inserts})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -387,8 +387,8 @@ function insertAuthor(res, mysql, inserts, complete){
     });
 }
 function insertGenre(res, mysql, inserts, complete){
-    var setNewGenre = "INSERT INTO Genre(genre_name) VALUES (?);";
-    mysql.pool.query(setNewGenre, inserts, function(error, results, fields){
+    // var setNewGenre = "INSERT INTO Genre(genre_name) VALUES (?);";
+    mysql.pool.query(`CALL sp_insert_genre(${...inserts})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -397,8 +397,8 @@ function insertGenre(res, mysql, inserts, complete){
     });
 }
 function insertPublisher(res, mysql, inserts, complete){
-    var setNewPublisher = "INSERT INTO Publisher(publisher_name, city, state) VALUES (?, ?, ?);";
-    mysql.pool.query(setNewPublisher, inserts, function(error, results, fields){
+    // var setNewPublisher = "INSERT INTO Publisher(publisher_name, city, state) VALUES (?, ?, ?);";
+    mysql.pool.query(`CALL sp_insert_publisher(${...inserts})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -408,8 +408,8 @@ function insertPublisher(res, mysql, inserts, complete){
 
 }
 function insertBookAuthor(res, mysql, inserts, complete) {
-    var setBookAuthor = "INSERT INTO Book_Author(isbn, author_id) VALUES (?, ?);";
-    mysql.pool.query(setBookAuthor, inserts, function(error, results, fields){
+    // var setBookAuthor = "INSERT INTO Book_Author(isbn, author_id) VALUES (?, ?);";
+    mysql.pool.query(`CALL sp_insert_book_author(${...inserts})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -418,8 +418,8 @@ function insertBookAuthor(res, mysql, inserts, complete) {
     });
 }
 function insertBookGenre(res, mysql, inserts, complete){
-    var setBookGenre = "INSERT INTO Book_Genre(isbn, genre_id) VALUES (?, ?);";
-    mysql.pool.query(setBookGenre, inserts, function(error, results, fields){
+    // var setBookGenre = "INSERT INTO Book_Genre(isbn, genre_id) VALUES (?, ?);";
+    mysql.pool.query(`CALL sp_insert_book_genre(${...inserts})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -428,10 +428,10 @@ function insertBookGenre(res, mysql, inserts, complete){
     });
 }
 function insertBookCopies(res, mysql, inserts, complete){
-    var setBookCopy = "INSERT INTO Book_Copy(isbn, copy_number) VALUES (?, ?);";
+    // var setBookCopy = "INSERT INTO Book_Copy(isbn, copy_number) VALUES (?, ?);";
     for(var i = 0; i < inserts[1]; i++){
         var newInserts = [inserts[0], i]; // isbn at index 0, current iteration as the current copy number
-        mysql.pool.query(setBookCopy, newInserts, function(error, results, fields){
+        mysql.pool.query(`CALL sp_insert_book_copy(${...newInserts})`, function(error, results, fields){
             if(error){
                 res.write(JSON.stringify(error));
                 res.end();
@@ -444,8 +444,8 @@ function insertBookLoan(res, mysql, inserts, complete){
     inserts.forEach(function(value){
         console.log(value);
     })
-    var setBookLoan = "INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) VALUES (?, ?, ?, ?);";
-    mysql.pool.query(setBookLoan, inserts, function(error, results, fields){
+    // var setBookLoan = "INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) VALUES (?, ?, ?, ?);";
+    mysql.pool.query(`CALL sp_insert_book_loan(${...innserts})`, function(error, results, fields){
         if(error){
             console.log(`error: ${JSON.stringify(error)}`);
             res.write(JSON.stringify(error));

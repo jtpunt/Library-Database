@@ -9,11 +9,13 @@ DROP TABLE IF EXISTS `Publisher`;
 DROP TABLE IF EXISTS `Genre`;
 DROP TABLE IF EXISTS `Patron`;
 
+/* Get Data Procedures */
 DROP PROCEDURE IF EXISTS sp_get_books;
 DROP PROCEDURE IF EXISTS sp_get_publishers;
 DROP PROCEDURE IF EXISTS sp_get_authors;
 DROP PROCEDURE IF EXISTS sp_get_patrons;
 DROP PROCEDURE IF EXISTS sp_get_genres;
+
 DROP PROCEDURE IF EXISTS sp_get_book_by_isbn;
 DROP PROCEDURE IF EXISTS sp_get_author_by_full_name;
 DROP PROCEDURE IF EXISTS sp_get_genre_by_name;
@@ -21,6 +23,17 @@ DROP PROCEDURE IF EXISTS sp_get_publisher_by_name;
 DROP PROCEDURE IF EXISTS sp_get_books_checked_out_by_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_books_reserved_by_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_available_copy_num_by_isbn;
+
+/* Insert Data Procedures */
+DROP PROCEDURE IF EXISTS sp_insert_book;
+DROP PROCEDURE IF EXISTS sp_insert_author;
+DROP PROCEDURE IF EXISTS sp_insert_genre;
+DROP PROCEDURE IF EXISTS sp_insert_publisher;
+DROP PROCEDURE IF EXISTS sp_insert_book_author;
+DROP PROCEDURE IF EXISTS sp_insert_book_genre;
+DROP PROCEDURE IF EXISTS sp_insert_book_copy;
+DROP PROCEDURE IF EXISTS sp_insert_book_loan;
+
 
 CREATE TABLE Publisher(
   publisher_id   int          NOT NULL AUTO_INCREMENT,
@@ -434,3 +447,107 @@ BEGIN
     WHERE bc.isbn = isbn && bc.copy_number NOT IN (
         SELECT bl.copy_number FROM Book_Loan bl WHERE bl.isbn = isbn);
 END $$
+
+
+/* Insert Book Data */
+DROP PROCEDURE IF EXISTS sp_insert_book;
+DELIMITER $$
+CREATE PROCEDURE `sp_insert_book`(
+    in isbn          varchar(10),
+    in title         varchar(100),
+    in description   text,
+    in pages         int,
+    in img_file_url  text
+)
+BEGIN
+    INSERT INTO Book(isbn, title, description, pages, img_file_url, publisher_id) 
+    VALUES (isbn, title, description, pages, img_file_url, publisher_id);
+END 
+
+/* Insert Author Data */
+DROP PROCEDURE IF EXISTS sp_insert_author;
+DELIMITER $$
+CREATE PROCEDURE `sp_insert_author`(
+    in last_name  varchar(255),
+    in first_name varchar(255)
+)
+BEGIN
+    INSERT INTO Author(last_name, first_name) 
+    VALUES (last_name, first_name);
+END $$
+
+/* Insert Author Data */
+DROP PROCEDURE IF EXISTS sp_insert_genre;
+DELIMITER $$
+CREATE PROCEDURE `sp_insert_genre`(
+    in genre_name varchar(255)
+)
+BEGIN
+    INSERT INTO Genre(genre_name) 
+    VALUES (genre_name);
+END $$
+
+/* Insert Author Data */
+DROP PROCEDURE IF EXISTS sp_insert_publisher;
+DELIMITER $$
+CREATE PROCEDURE `sp_insert_publisher`(
+    in publisher_name varchar(255),
+    in city           varchar(50),
+    in state          varchar(50)
+)
+BEGIN
+    INSERT INTO Publisher(publisher_name, city, state) 
+    VALUES (publisher_name, city, state);
+END $$
+
+
+/* Insert Book Author Data */
+DROP PROCEDURE IF EXISTS sp_insert_book_author;
+DELIMITER $$
+CREATE PROCEDURE `sp_insert_book_author`(
+    in isbn       varchar(10),
+    in author_id  int
+)
+BEGIN
+    INSERT INTO Book_Author(isbn, author_id) 
+    VALUES (isbn, author_id);
+END $$
+
+/* Insert Book Genre Data */
+DROP PROCEDURE IF EXISTS sp_insert_book_genre;
+DELIMITER $$
+CREATE PROCEDURE `sp_insert_book_genre`(
+    in isbn     varchar(10),
+    in genre_id int
+)
+BEGIN
+    INSERT INTO Book_Genre(isbn, genre_id) 
+    VALUES (isbn, genre_id);
+END $$
+
+/* Insert Book Genre Data */
+DROP PROCEDURE IF EXISTS sp_insert_book_copy;
+DELIMITER $$
+CREATE PROCEDURE `sp_insert_book_copy`(
+    in isbn          varchar(10),
+    in copy_number   int,
+)
+BEGIN
+    INSERT INTO Book_Copy(isbn, copy_number) 
+    VALUES (isbn, copy_number);
+END $$
+
+/* Insert Book Genre Data */
+DROP PROCEDURE IF EXISTS sp_insert_book_loan;
+DELIMITER $$
+CREATE PROCEDURE `sp_insert_book_loan`(
+    in isbn        varchar(10),
+    in copy_number int,
+    in patron_id   int,
+    in return_date date
+)
+BEGIN
+    INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) 
+    VALUES (isbn, copy_number, patron_id, return_date);
+END $$
+
