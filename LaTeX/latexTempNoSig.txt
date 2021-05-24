@@ -1,0 +1,18 @@
+`\\documentclass[12pt, letterpaper]{article} 
+\\usepackage[utf8]{inputenc}
+\\usepackage{float}
+\\usepackage{graphicx}
+\\graphicspath{ {/nfs/stak/users/perryjon/Employee-Recognition-Portal/LaTeX/images/} }
+\\title{Employee Recognition Program}
+\\author{${fname} ${lname}} 
+\\date{${datestamp}}
+\\begin{document}
+\\maketitle
+\\begin{center}
+\\includegraphics[width=0.3\\linewidth]{trophy}
+\\section*{You Won The ${award} Award!}
+${description}
+\\section*{This award was granted from}
+\\subsection*{${grantorFname} ${grantorLname}}
+\\end{center}
+\\end{document}` 
