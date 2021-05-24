@@ -28,7 +28,7 @@ router.post('/login', function(req, res){
     var inserts = [req.body.email, req.body.password]; 
     var redirect = "/book"; // Go to Book page by default
     console.log(inserts);     
-    sql = mysql.pool.query(`CALL sp_get_patron_by_email_and_pass('${req.body.email}', '${req.body.password}')`, function(error, results, fields){
+    sql = mysql.pool.query(`CALL sp_get_patron_by_email_and_pass(${mysql.pool.escape(req.body.email)}, ${mysql.pool. escape(req.body.password)})`, function(error, results, fields){
         if(error){
             console.log(JSON.stringify(error))
             res.write(JSON.stringify(error));
