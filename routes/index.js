@@ -34,7 +34,7 @@ router.post('/login', function(req, res){
             res.write(JSON.stringify(error));
             res.end();
         }else{
-            if (results[0] == undefined) {
+            if (results[0][0] == undefined) {
                 req.flash("error", "User not found!");
                 res.redirect('/login');
             }
