@@ -1,5 +1,8 @@
 
 var latex = {
+    latexTest: function(){
+        console.log(`in latexTest`);
+    },
     //create a latex file
     genLatex: function(userId, awardId, employeeId, grantDate) {
         console.log("Grant date..", + grantDate);

@@ -6,6 +6,7 @@
 
 var express    = require("express"),
     middleware = require("../middleware"),
+    latex      = require("../LaTeX"),
     router     = express.Router();
 
 router.route('/')
@@ -108,10 +109,6 @@ router.route('/')
                     scripts:  ["/static/js/books.js"],
                 },
                 numOfCallBacks = (req.session.patron_id ? 6 : 5);
-
-            console.log(`numOfCallBacks: ${numOfCallBacks}`);
-            console.log(`req.session.patron_id: ${req.session.patron_id}`);
-            console.log(`ternary test: ${(req.session.patron_id ? 6 : 5)}`);
             
             getBooks(res, mysql, context, complete);
             getPublishers(res, mysql, context, complete);
@@ -182,25 +179,6 @@ router.get('/new', middleware.isAdmin, function(req,res){
     }
 });
 router.route('/:isbn')
-    // CREATE a book loan by isbn 
-    .post(middleware.isLoggedIn,
-        (req, res) =>{
-            let context = {},
-                mysql   = req.app.get('mysql');
-            console.log(`in POST -> /${req.params.isbn}`);
-            // this function returns an available copy number for the book that's being loaned out
-            getAvailableCopy(res, mysql, req.params.isbn, context, complete);
-            function complete(){
-                var inserts = [req.params.isbn, context.Available, req.session.patron_id, '2017-12-01'];
-                insertBookLoan(res, mysql, inserts, finalComplete)
-            }
-            function finalComplete(){
-                // WARNING: Initially did not work on OSU server for some reason
-                //res.redirect(req.get('referer')); // refreshed the current page
-                res.end();
-            }
-        }
-    )
     // Retrieve a book by isbn
     .get(
         (req, res) => {
@@ -294,6 +272,59 @@ router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
             res.render('books/edit', context);
     });
 });
+router.route('/:isbn/hold')
+    // CREATE a book loan by isbn 
+    .post(middleware.isLoggedIn,
+        (req, res) =>{
+            let context = {},
+                mysql   = req.app.get('mysql');
+            console.log(`in POST -> /${req.params.isbn}`);
+            // this function returns an available copy number for the book that's being loaned out
+            getAvailableCopy(res, mysql, req.params.isbn, context, complete);
+            function complete(){
+                var inserts = [req.params.isbn, context.Available, req.session.patron_id, '2017-12-01'];
+                insertBookLoan(res, mysql, inserts, finalComplete)
+            }
+            function finalComplete(){
+                // WARNING: Initially did not work on OSU server for some reason
+                //res.redirect(req.get('referer')); // refreshed the current page
+                res.end();
+            }
+        }
+    )
+    // Delete a book hold
+    .delete(middleware.isLoggedIn,
+        (req, res) => {
+            console.log(`\nin DELETE -> /book/${req.params.isbn}/hold`);
+            console.log(`reserve patron_id: ${req.session.patron_id}`);
+            console.log(`reserve req data: ${JSON.stringify(req.body)}`)
+            let mysql        = req.app.get('mysql'),
+                isbn         = req.params['isbn'],
+                patron_id    = req.session.patron_id,
+                inserts      = [isbn, patron_id], 
+                sqlStatement = "DELETE FROM Book_Loan WHERE isbn = ? AND patron_id = ?";
+
+            mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+                if(error){
+                    console.log(`error? - ${JSON.stringify(error)}`);
+                    req.flash("error", "You have already reserved this book");
+                    // res.write(JSON.stringify(error));
+                    res.end();
+                }else if(results.affectedRows === 0){
+                    console.log("no results found");
+                    res.end();
+                }
+                else{
+                    
+                    console.log(`results: ${JSON.stringify(results)}`);
+                    
+                    console.log(`fields: ${JSON.stringify(fields)}`);
+                    res.end();
+                }
+            });
+        }
+    )
+
 router.route('/:isbn/reserve')
     // Reserve a book
     .post(middleware.isLoggedIn,
@@ -317,7 +348,7 @@ router.route('/:isbn/reserve')
                     res.end();
                 }
                 else{
-                    
+                    latex.latexTest();
                     console.log(`results: ${JSON.stringify(results)}`);
                     
                     console.log(`fields: ${JSON.stringify(fields)}`);
@@ -359,11 +390,6 @@ router.route('/:isbn/reserve')
 
         }
     )
-
-router.delete('/:isbn/hold', middleware.isLoggedIn, function(req,res){
-    console.log(`in DELETE -> /${req.params.isbn}/hold`);
-    res.end();
-});
 module.exports = router;
 
 function insertBook(res, mysql, inserts, complete){
@@ -614,11 +640,13 @@ function getPublisherID(res, mysql, inserts, context, complete){
     });
 }
 function getBooksCheckedOutByPatron(res, mysql, inserts, context, complete){
+    console.log(`\npatron_id in getBooksCheckedOutByPatron: ${inserts[0]}`)
     mysql.pool.query(`CALL sp_get_books_checked_out_by_patron_id(${inserts[0]})`, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
         }
+        console.log(`getBooksCheckedOutByPatron results: ${JSON.stringify(results)}`);
         context.holds = results[0];
         console.log(`hold found: ${JSON.stringify(results[0])}`);
         //appendImagePath(context.Book); // we need /static/images/ to be placed before the image file's name

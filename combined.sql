@@ -307,7 +307,6 @@ INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) VALUES('0553448
 */
 
 /* Get Books Procedure */
-DROP PROCEDURE IF EXISTS sp_get_books;
 DELIMITER $$
 
 CREATE PROCEDURE `sp_get_books`()
@@ -326,7 +325,6 @@ BEGIN
 END $$
 
 /* Get Publishers Procedure */
-DROP PROCEDURE IF EXISTS sp_get_publishers;
 DELIMITER $$
 
 CREATE PROCEDURE `sp_get_publishers`()
@@ -335,7 +333,6 @@ BEGIN
 END $$
 
 /* Get Authors Procedure */
-DROP PROCEDURE IF EXISTS sp_get_authors;
 DELIMITER $$
 
 CREATE PROCEDURE `sp_get_authors`()
@@ -344,7 +341,6 @@ BEGIN
 END $$
 
 /* Get Patrons Procedure */
-DROP PROCEDURE IF EXISTS sp_get_patrons;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_patrons`()
 BEGIN
@@ -352,7 +348,6 @@ BEGIN
 END $$
 
 /* Get Genres Procedure */
-DROP PROCEDURE IF EXISTS sp_get_genres;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_genres`()
 BEGIN
@@ -360,7 +355,6 @@ BEGIN
 END $$
 
 /* Get Book By ISBN Procedure */
-DROP PROCEDURE IF EXISTS sp_get_book_by_isbn;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_book_by_isbn`(
     in isbn varchar(10)
@@ -379,7 +373,6 @@ BEGIN
 END $$
 
 /* Get Author By Author ID Procedure */
-DROP PROCEDURE IF EXISTS sp_get_author_by_full_name;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_author_by_full_name`(
     in last_name varchar(255),
@@ -390,7 +383,6 @@ BEGIN
 END $$
 
 /* Get Genre By Genre ID Procedure */
-DROP PROCEDURE IF EXISTS sp_get_genre_by_name;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_genre_by_name`(
     in genre_name varchar(255)
@@ -400,7 +392,6 @@ BEGIN
 END $$
 
 /* Get Publisher By publisher ID Procedure */
-DROP PROCEDURE IF EXISTS sp_get_publisher_by_name;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_publisher_by_name`(
     in publisher_name varchar(255)
@@ -410,34 +401,30 @@ BEGIN
 END $$
 
 /* Get Books Checked Out By Patron ID Procedure */
-DROP PROCEDURE IF EXISTS sp_get_books_checked_out_by_patron_id;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_books_checked_out_by_patron_id`(
     in patron_id int
 )
 BEGIN
-    SELECT bl.isbn, b.title, b.img_file_url, DATE_FORMAT(bl.return_date, '%m/%d/%Y') AS return_date 
+    SELECT bl.isbn, b.title, b.img_file_url, bl.patron_id, DATE_FORMAT(bl.return_date, '%m/%d/%Y') AS return_date 
     FROM Book_Loan bl 
     INNER JOIN Book b ON bl.isbn = b.isbn 
-    WHERE patron_id = patron_id;
+    WHERE bl.patron_id = patron_id;
 END $$
 
 /* Get Books Reserved By Patron ID Procedure */
-
-DROP PROCEDURE IF EXISTS sp_get_books_reserved_by_patron_id;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_books_reserved_by_patron_id`(
     in patron_id int
 )
 BEGIN
-    SELECT br.isbn, b.title, b.img_file_url, DATE_FORMAT(br.reserve_date, '%m/%d/%Y') AS reserve_date 
+    SELECT br.isbn, b.title, b.img_file_url, br.patron_id, DATE_FORMAT(br.reserve_date, '%m/%d/%Y') AS reserve_date 
     FROM Book_Reservation br
     INNER JOIN Book b ON br.isbn = b.isbn
-    WHERE patron_id = patron_id;
+    WHERE br.patron_id = patron_id;
 END $$
 
 /* Get Available Copy Number by isbn*/
-DROP PROCEDURE IF EXISTS sp_get_available_copy_num_by_isbn;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_available_copy_num_by_isbn`(
     in isbn varchar(10)
@@ -450,7 +437,6 @@ BEGIN
 END $$
 
 /* Get Patron by email and password */
-DROP PROCEDURE IF EXISTS sp_get_patron_by_email_and_pass;
 DELIMITER $$
 CREATE PROCEDURE `sp_get_patron_by_email_and_pass`(
     in email    varchar(255),
@@ -464,7 +450,6 @@ BEGIN
 END $$
 
 /* Insert Book Data */
-DROP PROCEDURE IF EXISTS sp_insert_book;
 DELIMITER $$
 CREATE PROCEDURE `sp_insert_book`(
     in isbn          varchar(10),
@@ -476,10 +461,9 @@ CREATE PROCEDURE `sp_insert_book`(
 BEGIN
     INSERT INTO Book(isbn, title, description, pages, img_file_url, publisher_id) 
     VALUES (isbn, title, description, pages, img_file_url, publisher_id);
-END 
+END $$
 
 /* Insert Author Data */
-DROP PROCEDURE IF EXISTS sp_insert_author;
 DELIMITER $$
 CREATE PROCEDURE `sp_insert_author`(
     in last_name  varchar(255),
@@ -491,7 +475,6 @@ BEGIN
 END $$
 
 /* Insert Author Data */
-DROP PROCEDURE IF EXISTS sp_insert_genre;
 DELIMITER $$
 CREATE PROCEDURE `sp_insert_genre`(
     in genre_name varchar(255)
@@ -502,7 +485,6 @@ BEGIN
 END $$
 
 /* Insert Author Data */
-DROP PROCEDURE IF EXISTS sp_insert_publisher;
 DELIMITER $$
 CREATE PROCEDURE `sp_insert_publisher`(
     in publisher_name varchar(255),
@@ -516,7 +498,6 @@ END $$
 
 
 /* Insert Book Author Data */
-DROP PROCEDURE IF EXISTS sp_insert_book_author;
 DELIMITER $$
 CREATE PROCEDURE `sp_insert_book_author`(
     in isbn       varchar(10),
@@ -528,7 +509,6 @@ BEGIN
 END $$
 
 /* Insert Book Genre Data */
-DROP PROCEDURE IF EXISTS sp_insert_book_genre;
 DELIMITER $$
 CREATE PROCEDURE `sp_insert_book_genre`(
     in isbn     varchar(10),
@@ -540,11 +520,10 @@ BEGIN
 END $$
 
 /* Insert Book Genre Data */
-DROP PROCEDURE IF EXISTS sp_insert_book_copy;
 DELIMITER $$
 CREATE PROCEDURE `sp_insert_book_copy`(
     in isbn          varchar(10),
-    in copy_number   int,
+    in copy_number   int
 )
 BEGIN
     INSERT INTO Book_Copy(isbn, copy_number) 
@@ -552,7 +531,6 @@ BEGIN
 END $$
 
 /* Insert Book Genre Data */
-DROP PROCEDURE IF EXISTS sp_insert_book_loan;
 DELIMITER $$
 CREATE PROCEDURE `sp_insert_book_loan`(
     in isbn        varchar(10),

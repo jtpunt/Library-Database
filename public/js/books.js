@@ -19,7 +19,7 @@ function holdBook(isbn){
 	myObj.isbn = isbn;
     console.log(`in checkOutBook fn with isbn: ${isbn}`);
     $.ajax({
-        url: `/book/${isbn}`,
+        url: `/book/${isbn}/hold`,
         type: 'post',
         async:false,
     	success: function(result){
