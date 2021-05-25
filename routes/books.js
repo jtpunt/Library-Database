@@ -528,7 +528,6 @@ function getAuthors(res, mysql, context, complete){
         }
         context.authors = results[0];
         console.log(`author results: ${JSON.stringify(results)}`);
-
         complete();
     });
 }
