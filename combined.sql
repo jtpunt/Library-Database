@@ -10,19 +10,22 @@ DROP TABLE IF EXISTS `Genre`;
 DROP TABLE IF EXISTS `Patron`;
 
 /* Get Data Procedures */
-DROP PROCEDURE IF EXISTS sp_get_books;
+DROP PROCEDURE IF EXISTS sp_get_current_books;
 DROP PROCEDURE IF EXISTS sp_get_publishers;
 DROP PROCEDURE IF EXISTS sp_get_authors;
 DROP PROCEDURE IF EXISTS sp_get_patrons;
 DROP PROCEDURE IF EXISTS sp_get_genres;
 
 DROP PROCEDURE IF EXISTS sp_get_book_by_isbn;
+DROP PROCEDURE IF EXISTS sp_get_current_book_by_isbn;
 DROP PROCEDURE IF EXISTS sp_get_author_by_full_name;
 DROP PROCEDURE IF EXISTS sp_get_genre_by_name;
 DROP PROCEDURE IF EXISTS sp_get_publisher_by_name;
 DROP PROCEDURE IF EXISTS sp_get_books_checked_out_by_patron_id;
+DROP PROCEDURE IF EXISTS sp_get_reserve_date_by_isbn_and_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_books_reserved_by_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_available_copy_num_by_isbn;
+DROP PROCEDURE IF EXISTS sp_get_patron_by_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_patron_by_email_and_pass;
 
 /* Insert Data Procedures */
@@ -34,7 +37,15 @@ DROP PROCEDURE IF EXISTS sp_insert_book_author;
 DROP PROCEDURE IF EXISTS sp_insert_book_genre;
 DROP PROCEDURE IF EXISTS sp_insert_book_copy;
 DROP PROCEDURE IF EXISTS sp_insert_book_loan;
+DROP PROCEDURE IF EXISTS sp_insert_book_reservation;
 
+/* Delete Data Procedures */
+DROP PROCEDURE IF EXISTS sp_delete_book_by_isbn;
+DROP PROCEDURE IF EXISTS sp_delete_book_loan_by_isbn_and_patron_id;
+DROP PROCEDURE IF EXISTS sp_delete_book_reservation_by_isbn_and_patron_id;
+
+/* Update Data Procedures */
+DROP PROCEDURE IF EXISTS sp_update_book;
 
 CREATE TABLE Publisher(
   publisher_id   int          NOT NULL AUTO_INCREMENT,
@@ -309,7 +320,7 @@ INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) VALUES('0553448
 /* Get Books Procedure */
 DELIMITER $$
 
-CREATE PROCEDURE `sp_get_books`()
+CREATE PROCEDURE `sp_get_current_books`()
 BEGIN
   SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name,
   (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) -
@@ -357,6 +368,15 @@ END $$
 /* Get Book By ISBN Procedure */
 DELIMITER $$
 CREATE PROCEDURE `sp_get_book_by_isbn`(
+    in isbn varchar(10)
+)
+BEGIN
+    SELECT * FROM Book b WHERE b.isbn = isbn;
+END $$
+
+/* Get Current Book By ISBN Procedure */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_current_book_by_isbn`(
     in isbn varchar(10)
 )
 BEGIN
@@ -414,6 +434,16 @@ END $$
 
 /* Get Books Reserved By Patron ID Procedure */
 DELIMITER $$
+CREATE PROCEDURE `sp_get_reserve_date_by_isbn_and_patron_id`(
+    in isbn      varchar(10),
+    in patron_id int
+)
+BEGIN
+    SELECT reserve_date FROM Book_Reservation WHERE isbn = isbn AND patron_id = patron_id;
+END $$
+
+/* Get Books Reserved By Patron ID Procedure */
+DELIMITER $$
 CREATE PROCEDURE `sp_get_books_reserved_by_patron_id`(
     in patron_id int
 )
@@ -436,6 +466,14 @@ BEGIN
         SELECT bl.copy_number FROM Book_Loan bl WHERE bl.isbn = isbn);
 END $$
 
+/* Get Patron by patron_id */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_patron_by_patron_id`(
+    in _patron_id int
+)
+BEGIN
+    SELECT * FROM Patron WHERE patron_id = _patron_id LIMIT 1;
+END $$
 /* Get Patron by email and password */
 DELIMITER $$
 CREATE PROCEDURE `sp_get_patron_by_email_and_pass`(
@@ -543,3 +581,60 @@ BEGIN
     VALUES (isbn, copy_number, patron_id, return_date);
 END $$
 
+/* Insert Book Genre Data */
+DELIMITER $$
+CREATE PROCEDURE `sp_insert_book_reservation`(
+    in isbn         varchar(10),
+    in patron_id    int,
+    in reserve_date date
+)
+BEGIN
+    INSERT INTO Book_Reservation(isbn, patron_id, reserve_date) 
+    VALUES (isbn, patron_id, reserve_date);
+END $$
+
+
+/* Delete Book by isbn */
+DELIMITER $$
+CREATE PROCEDURE `sp_delete_book_by_isbn`(
+    in _isbn varchar(10)
+)
+BEGIN
+    DELETE FROM Book WHERE isbn = _isbn;
+END $$
+
+/* Delete Book Loan by isbn and patron id*/
+DELIMITER $$
+CREATE PROCEDURE `sp_delete_book_loan_by_isbn_and_patron_id`(
+    in _isbn      varchar(10),
+    in _patron_id int
+)
+BEGIN
+    DELETE FROM Book_Loan WHERE isbn = _isbn AND patron_id = _patron_id;
+END $$
+
+/* Delete Book Loan by isbn and patron id*/
+DELIMITER $$
+CREATE PROCEDURE `sp_delete_book_reservation_by_isbn_and_patron_id`(
+    in _isbn      varchar(10),
+    in _patron_id int
+)
+BEGIN
+    DELETE FROM Book_Reservation WHERE isbn = _isbn AND patron_id = _patron_id;
+END $$
+
+
+/* Update book */
+DELIMITER $$
+CREATE PROCEDURE `sp_update_book`(
+    in _title         varchar(100),
+    in _description   text,
+    in _pages         int,
+    in _img_file_url  text,
+    in _isbn          varchar(10)
+)
+BEGIN
+    UPDATE Book 
+    SET title=_title, description=_description, pages=_pages, img_file_url=_img_file_url 
+    WHERE isbn = _isbn;
+END $$

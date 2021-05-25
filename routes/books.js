@@ -195,10 +195,10 @@ router.route('/:isbn')
 
             function complete(){
                if(patron_id){
-                    console.log(`patron: ${patron_id}`);
-                    let inserts      = [isbnParam, patron_id],
-                        sqlStatement = "SELECT reserve_date FROM Book_Reservation WHERE isbn = ? AND patron_id = ?;";
-                    mysql.pool.query(sqlStatement, inserts, function(error1, results1, fields1){
+                    let inserts = [isbnParam, patron_id],
+                        sql     = `CALL sp_get_reserve_date_by_isbn_and_patron_id(?, ?)`;
+
+                    mysql.pool.query(sql, inserts, function(error1, results1, fields1){
                         if(error1){
                             console.log(`error: ${JSON.stringify(error1)}`);
                             res.write(JSON.stringify(error1));
@@ -223,10 +223,11 @@ router.route('/:isbn')
     // updates a book by the isbn given in the URI parameter
     .put(middleware.isAdmin,
         (req, res) => {
-            let mysql          = req.app.get('mysql'),
-                inserts        = [req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.isbn],
-                editBookByISBN = "UPDATE Book SET title=?, description=?, pages=?, img_file_url=? WHERE isbn=?;";
-            mysql.pool.query(editBookByISBN, inserts, function(error, results, fields){
+            let mysql   = req.app.get('mysql'),
+                inserts = [req.body.title, req.body.desc, req.body.pages, req.body.img_file_url, req.body.isbn],
+                sql     = `CALL sp_update_book(?, ?, ?, ?, ?)`;
+                
+            mysql.pool.query(sql, inserts, function(error, results, fields){
                 if(error){
                     res.write(JSON.stringify(error));
                     res.end();
@@ -240,10 +241,10 @@ router.route('/:isbn')
     // Delete a book by isbn
     .delete(middleware.isAdmin,
         (req, res) => {
-            let mysql         = req.app.get('mysql'),
-                inserts       = [req.params.id],
-                delBookByISBN = "DELETE FROM Book WHERE isbn = ?";
-            mysql.pool.query(delBookByISBN, req.body.isbn, function(error, results, fields){
+            let mysql = req.app.get('mysql'),
+                isbn  = req.params.isbn,
+                sql   = `CALL sp_delete_book_by_isbn(?)`;
+            mysql.pool.query(sql, isbn, function(error, results, fields){
                 if(error){
                     res.write(JSON.stringify(error));
                     res.status(400).end();
@@ -255,21 +256,21 @@ router.route('/:isbn')
 
 /* Display one book for the specific purpose of updating information in that book */
 router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
-    let mysql          = req.app.get('mysql'),
-        isbnParam      = req.params.isbn,
-        getBookByISBN = "SELECT * FROM Book WHERE isbn = ?",
-        context        = {
+    let mysql   = req.app.get('mysql'),
+        isbn    = req.params.isbn,
+        sql     = `CALL sp_get_book_by_isbn(?)`,
+        context = {
             stylesheets: [],
             scripts:  ["/static/js/updatebook.js"]
         };
-    console.log("Edit book route");
-    mysql.pool.query(getBookByISBN, isbnParam, function(error, results, fields){
+    mysql.pool.query(sql, isbn, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
-        }else
-            context.book = results[0];             
+        }else{
+            context.book = results[0][0];             
             res.render('books/edit', context);
+        }
     });
 });
 router.route('/:isbn/hold')
@@ -296,28 +297,23 @@ router.route('/:isbn/hold')
     .delete(middleware.isLoggedIn,
         (req, res) => {
             console.log(`\nin DELETE -> /book/${req.params.isbn}/hold`);
-            console.log(`reserve patron_id: ${req.session.patron_id}`);
-            console.log(`reserve req data: ${JSON.stringify(req.body)}`)
-            let mysql        = req.app.get('mysql'),
-                isbn         = req.params['isbn'],
-                patron_id    = req.session.patron_id,
-                inserts      = [isbn, patron_id], 
-                sqlStatement = "DELETE FROM Book_Loan WHERE isbn = ? AND patron_id = ?";
+            let mysql     = req.app.get('mysql'),
+                isbn      = req.params['isbn'],
+                patron_id = req.session.patron_id,
+                inserts   = [isbn, patron_id],
+                sql       = `CALL sp_delete_book_loan_by_isbn_and_patron_id(?, ?)`;
 
-            mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+            mysql.pool.query(sql, inserts, function(error, results, fields){
                 if(error){
                     console.log(`error? - ${JSON.stringify(error)}`);
                     req.flash("error", "You have already reserved this book");
-                    // res.write(JSON.stringify(error));
                     res.end();
                 }else if(results.affectedRows === 0){
                     console.log("no results found");
                     res.end();
                 }
                 else{
-                    
                     console.log(`results: ${JSON.stringify(results)}`);
-                    
                     console.log(`fields: ${JSON.stringify(fields)}`);
                     res.end();
                 }
@@ -334,10 +330,10 @@ router.route('/:isbn/reserve')
                 isbn         = req.params['isbn'],
                 patron_id    = req.session.patron_id,
                 reserve_date = new Date(),
-                inserts      = [isbn, patron_id, reserve_date], 
-                sqlStatement = "INSERT INTO Book_Reservation(isbn, patron_id, reserve_date) VALUES (?, ?, ?);";
-            console.log(`reserve inserts: ${inserts}`);
-            mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+                inserts      = [isbn, patron_id, reserve_date],
+                sql          = `CALL sp_insert_book_reservation(?, ?, ?)`;
+
+            mysql.pool.query(sql, inserts, function(error, results, fields){
                 if(error){
                     console.log(`error? - ${JSON.stringify(error)}`);
                     req.flash("error", "You have already reserved this book");
@@ -350,7 +346,6 @@ router.route('/:isbn/reserve')
                 else{
                     latex.latexTest();
                     console.log(`results: ${JSON.stringify(results)}`);
-                    
                     console.log(`fields: ${JSON.stringify(fields)}`);
                     res.end();
                 }
@@ -361,15 +356,12 @@ router.route('/:isbn/reserve')
     // Delete a book reservation
     .delete(middleware.isLoggedIn,
         (req, res) => {
-            console.log(`reserve patron_id: ${req.session.patron_id}`);
-            console.log(`reserve req data: ${JSON.stringify(req.body)}`)
-            let mysql        = req.app.get('mysql'),
-                isbn         = req.params['isbn'],
-                patron_id    = req.session.patron_id,
-                inserts      = [isbn, patron_id], 
-                sqlStatement = "DELETE FROM Book_Reservation WHERE isbn = ? AND patron_id = ?";
-
-            mysql.pool.query(sqlStatement, inserts, function(error, results, fields){
+            let mysql     = req.app.get('mysql'),
+                isbn      = req.params['isbn'],
+                patron_id = req.session.patron_id,
+                inserts   = [isbn, patron_id],
+                sql       = `CALL sp_delete_book_reservation_by_isbn_and_patron_id(?, ?)`
+            mysql.pool.query(sql, inserts, function(error, results, fields){
                 if(error){
                     console.log(`error? - ${JSON.stringify(error)}`);
                     req.flash("error", "You have already reserved this book");
@@ -380,9 +372,7 @@ router.route('/:isbn/reserve')
                     res.end();
                 }
                 else{
-                    
                     console.log(`results: ${JSON.stringify(results)}`);
-                    
                     console.log(`fields: ${JSON.stringify(fields)}`);
                     res.end();
                 }
@@ -393,8 +383,8 @@ router.route('/:isbn/reserve')
 module.exports = router;
 
 function insertBook(res, mysql, inserts, complete){
-    //var setNewBook = "INSERT INTO Book(isbn, title, description, pages, img_file_url, publisher_id) VALUES (?, ?, ?, ?, ?, ?);";
-    mysql.pool.query(`CALL sp_insert_book('${inserts[0]}', ${inserts[1]}, ${inserts[2]}, ${inserts[3]}, ${inserts[4]})`, function(error, results, fields){
+    let sql = `CALL sp_insert_book(?, ?, ?, ?, ?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -403,8 +393,8 @@ function insertBook(res, mysql, inserts, complete){
     });
 }
 function insertAuthor(res, mysql, inserts, complete){
-    // var setNewAuthor = "INSERT INTO Author(last_name, first_name) VALUES (?, ?);";
-    mysql.pool.query(`CALL sp_insert_author(${inserts[0]}, ${inserts[1]})`, function(error, results, fields){
+    let sql = `CALL sp_insert_author(?, ?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -413,8 +403,8 @@ function insertAuthor(res, mysql, inserts, complete){
     });
 }
 function insertGenre(res, mysql, inserts, complete){
-    // var setNewGenre = "INSERT INTO Genre(genre_name) VALUES (?);";
-    mysql.pool.query(`CALL sp_insert_genre(${inserts[0]})`, function(error, results, fields){
+    let sql = `CALL sp_insert_genre(?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -423,8 +413,8 @@ function insertGenre(res, mysql, inserts, complete){
     });
 }
 function insertPublisher(res, mysql, inserts, complete){
-    // var setNewPublisher = "INSERT INTO Publisher(publisher_name, city, state) VALUES (?, ?, ?);";
-    mysql.pool.query(`CALL sp_insert_publisher(${inserts[0]}, ${inserts[1]}, ${inserts[2]})`, function(error, results, fields){
+    let sql = `CALL sp_insert_publisher(?, ?, ?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -434,8 +424,8 @@ function insertPublisher(res, mysql, inserts, complete){
 
 }
 function insertBookAuthor(res, mysql, inserts, complete) {
-    // var setBookAuthor = "INSERT INTO Book_Author(isbn, author_id) VALUES (?, ?);";
-    mysql.pool.query(`CALL sp_insert_book_author('${inserts[0]}', ${inserts[1]})`, function(error, results, fields){
+    let sql = `CALL sp_insert_book_author(?, ?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -444,8 +434,8 @@ function insertBookAuthor(res, mysql, inserts, complete) {
     });
 }
 function insertBookGenre(res, mysql, inserts, complete){
-    // var setBookGenre = "INSERT INTO Book_Genre(isbn, genre_id) VALUES (?, ?);";
-    mysql.pool.query(`CALL sp_insert_book_genre('${inserts[0]}', ${inserts[1]})`, function(error, results, fields){
+    let sql = `CALL sp_insert_book_genre(?, ?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -454,10 +444,10 @@ function insertBookGenre(res, mysql, inserts, complete){
     });
 }
 function insertBookCopies(res, mysql, inserts, complete){
-    // var setBookCopy = "INSERT INTO Book_Copy(isbn, copy_number) VALUES (?, ?);";
+    let sql = `CALL sp_insert_book_copy(?, ?)`;
     for(var i = 0; i < inserts[1]; i++){
         var newInserts = [inserts[0], i]; // isbn at index 0, current iteration as the current copy number
-        mysql.pool.query(`CALL sp_insert_book_copy('${newInserts[0]}', ${newInserts[1]})`, function(error, results, fields){
+        mysql.pool.query(sql, newInserts, function(error, results, fields){
             if(error){
                 res.write(JSON.stringify(error));
                 res.end();
@@ -467,11 +457,8 @@ function insertBookCopies(res, mysql, inserts, complete){
     complete();
 }
 function insertBookLoan(res, mysql, inserts, complete){
-    inserts.forEach(function(value){
-        console.log(value);
-    })
-    // var setBookLoan = "INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) VALUES (?, ?, ?, ?);";
-    mysql.pool.query(`CALL sp_insert_book_loan('${inserts[0]}', ${inserts[1]}, ${inserts[2]}, '${inserts[3]}')`, function(error, results, fields){
+    let sql = `CALL sp_insert_book_loan(?, ?, ?, ?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             console.log(`error: ${JSON.stringify(error)}`);
             res.write(JSON.stringify(error));
@@ -482,7 +469,8 @@ function insertBookLoan(res, mysql, inserts, complete){
     });
 }
 function getAvailableCopy(res, mysql, isbn, context, complete){
-    mysql.pool.query(`CALL sp_get_available_copy_num_by_isbn('${isbn}')`, function(error, results, fields){
+    let sql = `CALL sp_get_available_copy_num_by_isbn(?)`;
+    mysql.pool.query(sql, isbn, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -494,8 +482,9 @@ function getAvailableCopy(res, mysql, isbn, context, complete){
     });
 }
 function getBookByIsbn(req, mysql, context, complete){
-    var isbnParam      = req.params.isbn;
-    mysql.pool.query(`CALL sp_get_book_by_isbn('${isbnParam}')`, function(error, results, fields){
+    let isbn = req.params.isbn,
+        sql  = `CALL sp_get_current_book_by_isbn(?)`;
+    mysql.pool.query(sql, isbn, function(error, results, fields){
         if(error){
             console.log(`error: ${JSON.stringify(error)}`);
             res.write(JSON.stringify(error));
@@ -509,7 +498,7 @@ function getBookByIsbn(req, mysql, context, complete){
     });
 }
 function getBooks(res, mysql, context, complete){
-    mysql.pool.query('CALL sp_get_books()', function(error, results, fields){
+    mysql.pool.query('CALL sp_get_current_books()', function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -610,7 +599,8 @@ function getBookByFilter(res, mysql, context, req, complete){
     });
 }
 function getAuthorID(res, mysql, inserts, context, complete){
-    mysql.pool.query(`CALL sp_get_author_by_full_name(${inserts[0]}, ${inserts[1]})`, function(error, results, fields){
+    let sql = `CALL sp_get_author_by_full_name(?, ?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -620,7 +610,8 @@ function getAuthorID(res, mysql, inserts, context, complete){
     });
 }
 function getGenreID(res, mysql, inserts, context, complete){
-    mysql.pool.query(`CALL sp_get_genre_by_name(${inserts[0]})`, function(error, results, fields){
+    let sql = `CALL sp_get_genre_by_name(/?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -630,7 +621,8 @@ function getGenreID(res, mysql, inserts, context, complete){
     });
 }
 function getPublisherID(res, mysql, inserts, context, complete){
-    mysql.pool.query(`CALL sp_get_publisher_by_name(${inserts[0]})`, function(error, results, fields){
+    let sql = `CALL sp_get_publisher_by_name(?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -640,8 +632,8 @@ function getPublisherID(res, mysql, inserts, context, complete){
     });
 }
 function getBooksCheckedOutByPatron(res, mysql, inserts, context, complete){
-    console.log(`\npatron_id in getBooksCheckedOutByPatron: ${inserts[0]}`)
-    mysql.pool.query(`CALL sp_get_books_checked_out_by_patron_id(${inserts[0]})`, function(error, results, fields){
+    let sql = `CALL sp_get_books_checked_out_by_patron_id(?)`;
+    mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();

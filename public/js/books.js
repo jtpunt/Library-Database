@@ -35,7 +35,7 @@ function deleteBook(isbn){
         type: 'delete',
         async:false,
         success: function(result){
-            window.location.reload(true);
+            window.location = "/book";
         }
     });
 }
@@ -46,8 +46,11 @@ function deleteBookHold(isbn){
         url: `/book/${isbn}/hold`,
         type: 'delete',
         async:false,
-        success: function(result){
-            window.location.reload(true);
+        success: function(response){
+            window.location = "/book";
+        },
+        failure: function (response){
+            console.log(response.d);
         }
     });
 }

@@ -23,12 +23,11 @@ router.get('/login', function(req, res){
 // main dashboard page
 router.post('/login', function(req, res){
     console.log("IN LOGIN - POST");
-    var mysql = req.app.get('mysql');
-    var sql = "SELECT * FROM Patron WHERE email = ? AND password = ? LIMIT 1;";
-    var inserts = [req.body.email, req.body.password]; 
-    var redirect = "/book"; // Go to Book page by default
-    console.log(inserts);     
-    sql = mysql.pool.query(`CALL sp_get_patron_by_email_and_pass(${mysql.pool.escape(req.body.email)}, ${mysql.pool. escape(req.body.password)})`, function(error, results, fields){
+    let mysql    = req.app.get('mysql'),
+        redirect = "/book"; // Go to Book page by default   
+        sql      = `CALL sp_get_patron_by_email_and_pass(?, ?)`,
+        inserts  = [req.body.email, req.body.password];
+    sql = mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             console.log(JSON.stringify(error))
             res.write(JSON.stringify(error));
