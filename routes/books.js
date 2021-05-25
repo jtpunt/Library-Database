@@ -191,7 +191,7 @@ router.route('/:isbn')
                 };
             console.log("Show book route");
 
-            getBookByIsbn(req, mysql, context, complete);
+            getBookByIsbn(res, mysql, isbnParam, context, complete);
 
             function complete(){
                if(patron_id){
@@ -481,9 +481,8 @@ function getAvailableCopy(res, mysql, isbn, context, complete){
         complete();
     });
 }
-function getBookByIsbn(req, mysql, context, complete){
-    let isbn = req.params.isbn,
-        sql  = `CALL sp_get_current_book_by_isbn(?)`;
+function getBookByIsbn(res, mysql, isbn, context, complete){
+    let sql  = `CALL sp_get_current_book_by_isbn(?)`;
     mysql.pool.query(sql, isbn, function(error, results, fields){
         if(error){
             console.log(`error: ${JSON.stringify(error)}`);
