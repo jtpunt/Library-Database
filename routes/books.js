@@ -497,7 +497,8 @@ function getBookByIsbn(res, mysql, isbn, context, complete){
     });
 }
 function getBooks(res, mysql, context, complete){
-    mysql.pool.query('CALL sp_get_current_books()', function(error, results, fields){
+    let sql = 'CALL sp_get_current_books()';
+    mysql.pool.query(sql, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -508,7 +509,8 @@ function getBooks(res, mysql, context, complete){
     });
 }
 function getPublishers(res, mysql, context, complete){
-    mysql.pool.query('CALL sp_get_publishers()', function(error, results, fields){
+    let sql = 'CALL sp_get_publishers()';
+    mysql.pool.query(sql, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -518,8 +520,8 @@ function getPublishers(res, mysql, context, complete){
     });
 }
 function getAuthors(res, mysql, context, complete){
-    //var getAuthors = "SELECT DISTINCT author_id, CONCAT(first_name, ' ', last_name) AS author_name FROM Author ORDER BY author_name ASC;";
-    mysql.pool.query('CALL sp_get_authors()', function(error, results, fields){
+    let sql = 'CALL sp_get_authors()';
+    mysql.pool.query(sql, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -531,7 +533,8 @@ function getAuthors(res, mysql, context, complete){
     });
 }
 function getPatrons(res, mysql, context, complete){
-    mysql.pool.query('CALL sp_get_patrons()', function(error, results, fields){
+    let sql = 'CALL sp_get_patrons()';
+    mysql.pool.query(sql, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
@@ -541,7 +544,8 @@ function getPatrons(res, mysql, context, complete){
     });
 }
 function getGenre(res, mysql, context, complete){
-    mysql.pool.query('CALL sp_get_genres()', function(error, results, fields){
+    let sql = 'CALL sp_get_genres()';
+    mysql.pool.query(sql, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));
             res.end();
