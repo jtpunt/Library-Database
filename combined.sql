@@ -435,11 +435,11 @@ END $$
 /* Get Books Reserved By Patron ID Procedure */
 DELIMITER $$
 CREATE PROCEDURE `sp_get_reserve_date_by_isbn_and_patron_id`(
-    in isbn      varchar(10),
-    in patron_id int
+    in _isbn      varchar(10),
+    in _patron_id int
 )
 BEGIN
-    SELECT reserve_date FROM Book_Reservation WHERE isbn = isbn AND patron_id = patron_id;
+    SELECT reserve_date FROM Book_Reservation WHERE isbn = _isbn AND patron_id = _patron_id;
 END $$
 
 /* Get Books Reserved By Patron ID Procedure */

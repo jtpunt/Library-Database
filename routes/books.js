@@ -207,10 +207,13 @@ router.route('/:isbn')
                             console.log(`no results: ${JSON.stringify(results1)}`);
                         }
                         else{
-                            console.log(`results: ${JSON.stringify(results1)}`);
-                            let date = new Date(results1[0]['reserve_date']),
-                                reserve_date = (date.getMonth() + 1) + '/' + date.getDate() + '/' +  date.getFullYear();
-                            context.book.reserve_date = reserve_date;
+                            console.log(`date results: ${JSON.stringify(results1)}`);
+                            // make sure results were found
+                            if(results1[0].length && results1[0][0]['reserve_date']){
+                                let date = new Date(results1[0][0]['reserve_date']),
+                                    reserve_date = (date.getMonth() + 1) + '/' + date.getDate() + '/' +  date.getFullYear();
+                                context.book.reserve_date = reserve_date;
+                            }
                         }
                         res.render('books/show', context);
                     });
@@ -279,7 +282,7 @@ router.route('/:isbn/hold')
         (req, res) =>{
             let context = {},
                 mysql   = req.app.get('mysql');
-            console.log(`in POST -> /${req.params.isbn}`);
+            console.log(`in POST -> /${req.params.isbn}/hold`);
             // this function returns an available copy number for the book that's being loaned out
             getAvailableCopy(res, mysql, req.params.isbn, context, complete);
             function complete(){
@@ -325,7 +328,7 @@ router.route('/:isbn/reserve')
     // Reserve a book
     .post(middleware.isLoggedIn,
         (req, res) => {
-            console.log(`reserve patron_id: ${req.session.patron_id}`);
+            console.log(`reserve reserve patron_id: ${req.session.patron_id}`);
             let mysql        = req.app.get('mysql'),
                 isbn         = req.params['isbn'],
                 patron_id    = req.session.patron_id,
@@ -335,7 +338,7 @@ router.route('/:isbn/reserve')
 
             mysql.pool.query(sql, inserts, function(error, results, fields){
                 if(error){
-                    console.log(`error? - ${JSON.stringify(error)}`);
+                    console.log(`reserve error? - ${JSON.stringify(error)}`);
                     req.flash("error", "You have already reserved this book");
                     // res.write(JSON.stringify(error));
                     res.end();
@@ -344,7 +347,7 @@ router.route('/:isbn/reserve')
                     res.end();
                 }
                 else{
-                    latex.latexTest();
+                    // latex.latexTest();
                     console.log(`results: ${JSON.stringify(results)}`);
                     console.log(`fields: ${JSON.stringify(fields)}`);
                     res.end();
