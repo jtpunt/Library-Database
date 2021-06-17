@@ -16,7 +16,8 @@ var express = require('express'),
 	app = express();
 
 // Requiring routes
-var indexRoutes   = require("./routes/index"),
+var adminRoutes   = require("./routes/admin"),
+    indexRoutes   = require("./routes/index"),
 	bookRoutes    = require("./routes/books"),
     profileRoutes = require("./routes/profile");
 /**********************************************************************
@@ -60,6 +61,7 @@ app.use(function(req, res, next){
 * Setup Routes For Our Server
 **********************************************************************/
 app.use("/", indexRoutes);
+app.use("/admin", adminRoutes);
 app.use("/book", bookRoutes);
 app.use("/profile", profileRoutes);
 app.use(function(req,res){
