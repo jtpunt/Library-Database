@@ -61,7 +61,22 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/login" style="color: black">Login</a>
                         </li>
-                    <% } else { %>
+                    <% }else if(admin_user){ %>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-fw fa-user-circle"></i> 
+                                <%= currentUser %></a>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="/admin">View Admin Page</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/logout" style="color: black">
+                                    <i class="fa fa-fw fa-sign-out-alt"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+                    <% }else{ %>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-fw fa-user-circle"></i> 
