@@ -1,5 +1,5 @@
 <%- include ('partials/header') %>
-<div class="row d-flex justify-content-center align-items-center min-vh-100" >
+<div class="row d-flex justify-content-center align-items-center" >
     <div class="col-md-4 mx-auto">
         <h1 style="text-align: center">Login</h1>
         <form action="/login" method="post">
@@ -17,14 +17,13 @@
                 </span>
                 <input class="form-control" type="password" name="password" placeholder="password" required maxlength="50">
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-3 justify-content-between">
                 <button class="btn btn-lg btn-primary btn-block">Login</button>
+                <a href="/forgot" class="btn btn-outline-warning btn-lg">
+                    <i class="fa fa-tree"></i> Forgot password?
+                </a>
             </div>
         </form>
-        <div>
-            <a href="/forgot" class="btn btn-default btn-lg"><i class="fa fa-tree"></i> Forgot password?
-            </a>
-        </div> 
     </div>    
 </div>
 <%- include ('partials/footer') %>
