@@ -4,6 +4,7 @@ var express    = require("express"),
     router     = express.Router();
 
 router.get('/', middleware.isAdmin, function(req,res){
+	// Retrieve all books that are on hold
     res.render('admin/index');
 });
 
