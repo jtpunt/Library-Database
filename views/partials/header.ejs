@@ -63,7 +63,10 @@
                             </a>
                             <div class="dropdown-menu">
                                 <h1 class="dropdown-header">Profile</h1>
-                                <a class="dropdown-item" href="/profile/holds">View Holds</a>
+                                <a class="dropdown-item" href="/profile/holds">
+                                    <i class="fa fa-fw fa-hold"></i>
+                                    View Holds
+                                </a>
                                 <a class="dropdown-item" href="/profile/reservations">View Reservations</a>
                                 <a class="dropdown-item" href="/profile">
                                     <i class="fa fa-fw fa-cog"></i>
@@ -72,9 +75,12 @@
                                 <div class="dropdown-divider"></div>
                                 <% if(admin_user){ %>
                                     <h1 class="dropdown-header">Admin</h1>
-                                    <a class="dropdown-item" href="/book/new">Add Books</a>
+                                    <a class="dropdown-item" href="/book/new">
+                                        <i class="fa fa-fw fa-plus"></i>
+                                        Add Books
+                                    </a>
                                     <a class="dropdown-item" href="/admin">View Admin Page</a>
-                                    <a class="dropdown-item" href="/admin">View Holds</a>
+                                    <a class="dropdown-item" href="/admin">View Patron Holds</a>
                                     <a class="dropdown-item" href="/admin">View Past Due</a>
                                 <% } %>
                                 <div class="dropdown-divider"></div>
