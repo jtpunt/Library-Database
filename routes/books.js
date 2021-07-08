@@ -304,7 +304,7 @@ router.route('/:isbn/hold')
                 isbn      = req.params['isbn'],
                 patron_id = req.session.patron_id,
                 inserts   = [isbn, patron_id],
-                sql       = `CALL sp_delete_book_loan_by_isbn_and_patron_id(?, ?)`;
+                sql       = `CALL sp_delete_book_hold_by_isbn_and_patron_id(?, ?)`;
 
             mysql.pool.query(sql, inserts, function(error, results, fields){
                 if(error){
@@ -460,7 +460,7 @@ function insertBookCopies(res, mysql, inserts, complete){
     complete();
 }
 function insertBookLoan(res, mysql, inserts, complete){
-    let sql = `CALL sp_insert_book_loan(?, ?, ?, ?)`;
+    let sql = `CALL sp_insert_book_hold(?, ?, ?, ?)`;
     mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             console.log(`error: ${JSON.stringify(error)}`);
@@ -560,7 +560,7 @@ function getBookByFilter(res, mysql, context, req, complete){
     var sqlCommand = 
             "SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, p.publisher_id,  \
             (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - \
-            (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, \
+            (SELECT COUNT(bh.isbn) FROM Book_Hold bh WHERE b.isbn = bh.isbn) AS Copies_Available, \
             CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, a.author_id, g.genre_id, g.genre_name FROM Book b \
             INNER JOIN Publisher p ON b.publisher_id = p.publisher_id \
             INNER JOIN Book_Genre bg ON b.isbn = bg.isbn \
@@ -637,7 +637,7 @@ function getPublisherID(res, mysql, inserts, context, complete){
     });
 }
 function getBooksCheckedOutByPatron(res, mysql, inserts, context, complete){
-    let sql = `CALL sp_get_books_checked_out_by_patron_id(?)`;
+    let sql = `CALL sp_get_book_holds_by_patron_id(?)`;
     mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
             res.write(JSON.stringify(error));

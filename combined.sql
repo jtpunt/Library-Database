@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `Book_Copy`;
 DROP TABLE IF EXISTS `Book_Author`;
 DROP TABLE IF EXISTS `Author`;
 DROP TABLE IF EXISTS `Book_Genre`;
-DROP TABLE IF EXISTS `Book_Loan`;
+DROP TABLE IF EXISTS `Book_Hold`;
 DROP TABLE IF EXISTS `Book_Reservation`;
 DROP TABLE IF EXISTS `Book`;
 DROP TABLE IF EXISTS `Publisher`;
@@ -21,7 +21,7 @@ DROP PROCEDURE IF EXISTS sp_get_current_book_by_isbn;
 DROP PROCEDURE IF EXISTS sp_get_author_by_full_name;
 DROP PROCEDURE IF EXISTS sp_get_genre_by_name;
 DROP PROCEDURE IF EXISTS sp_get_publisher_by_name;
-DROP PROCEDURE IF EXISTS sp_get_books_checked_out_by_patron_id;
+DROP PROCEDURE IF EXISTS sp_get_book_holds_by_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_reserve_date_by_isbn_and_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_books_reserved_by_patron_id;
 DROP PROCEDURE IF EXISTS sp_get_available_copy_num_by_isbn;
@@ -36,12 +36,12 @@ DROP PROCEDURE IF EXISTS sp_insert_publisher;
 DROP PROCEDURE IF EXISTS sp_insert_book_author;
 DROP PROCEDURE IF EXISTS sp_insert_book_genre;
 DROP PROCEDURE IF EXISTS sp_insert_book_copy;
-DROP PROCEDURE IF EXISTS sp_insert_book_loan;
+DROP PROCEDURE IF EXISTS sp_insert_book_hold;
 DROP PROCEDURE IF EXISTS sp_insert_book_reservation;
 
 /* Delete Data Procedures */
 DROP PROCEDURE IF EXISTS sp_delete_book_by_isbn;
-DROP PROCEDURE IF EXISTS sp_delete_book_loan_by_isbn_and_patron_id;
+DROP PROCEDURE IF EXISTS sp_delete_book_hold_by_isbn_and_patron_id;
 DROP PROCEDURE IF EXISTS sp_delete_book_reservation_by_isbn_and_patron_id;
 
 /* Update Data Procedures */
@@ -123,12 +123,12 @@ CREATE TABLE Patron(
   PRIMARY KEY (patron_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE Book_Loan(
+CREATE TABLE Book_Hold(
   isbn        varchar(10)  NOT NULL,
   copy_number int      NOT NULL,
   patron_id   int      NOT NULL,
   return_date date     NOT NULL,
-  CONSTRAINT unique_Book_Loan UNIQUE(isbn, copy_number),
+  CONSTRAINT unique_Book_Hold UNIQUE(isbn, copy_number),
   PRIMARY KEY (isbn, copy_number),
   FOREIGN KEY (isbn) REFERENCES Book(isbn) ON DELETE CASCADE ON UPDATE CASCADE,
   -- FOREIGN KEY (copy_number) REFERENCES Book_Copy(copy_number) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -306,10 +306,10 @@ INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0553582011', 0);
 /***********************
 * Book Loans Inserts
 ***********************/
-INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) VALUES('0553448129', 0, 
+INSERT INTO Book_Hold(isbn, copy_number, patron_id, return_date) VALUES('0553448129', 0, 
   (SELECT patron_id FROM Patron WHERE last_name = 'Perry' && first_name = "Jonathan"), '2017-12-01'
 );
-INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) VALUES('0553448129', 3, 
+INSERT INTO Book_Hold(isbn, copy_number, patron_id, return_date) VALUES('0553448129', 3, 
   (SELECT patron_id FROM Patron WHERE last_name = 'Pinkerton' && first_name = "Mike"), '2017-12-12'
 );
 
@@ -324,7 +324,7 @@ CREATE PROCEDURE `sp_get_current_books`()
 BEGIN
   SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name,
   (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) -
-  (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available,
+  (SELECT COUNT(bh.isbn) FROM Book_Hold bh WHERE b.isbn = bh.isbn) AS Copies_Available,
   CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b
   INNER JOIN Publisher p ON b.publisher_id = p.publisher_id 
   INNER JOIN Book_Genre bg ON b.isbn = bg.isbn 
@@ -382,7 +382,7 @@ CREATE PROCEDURE `sp_get_current_book_by_isbn`(
 BEGIN
     SELECT b.isbn, b.title, b.description, b.pages, b.img_file_url, p.publisher_name, 
     (SELECT COUNT(bc.isbn) FROM Book_Copy bc WHERE b.isbn = bc.isbn) - 
-    (SELECT COUNT(bl.isbn) FROM Book_Loan bl WHERE b.isbn = bl.isbn) AS Copies_Available, 
+    (SELECT COUNT(bh.isbn) FROM Book_Hold bh WHERE b.isbn = bh.isbn) AS Copies_Available, 
     CONCAT(a.first_name, ' ', a.last_name) AS Author_Name, g.genre_name FROM Book b 
     INNER JOIN Publisher p ON b.publisher_id = p.publisher_id 
     INNER JOIN Book_Genre bg ON b.isbn = bg.isbn 
@@ -422,14 +422,14 @@ END $$
 
 /* Get Books Checked Out By Patron ID Procedure */
 DELIMITER $$
-CREATE PROCEDURE `sp_get_books_checked_out_by_patron_id`(
+CREATE PROCEDURE `sp_get_book_holds_by_patron_id`(
     in patron_id int
 )
 BEGIN
-    SELECT bl.isbn, b.title, b.img_file_url, bl.patron_id, DATE_FORMAT(bl.return_date, '%m/%d/%Y') AS return_date 
-    FROM Book_Loan bl 
-    INNER JOIN Book b ON bl.isbn = b.isbn 
-    WHERE bl.patron_id = patron_id;
+    SELECT bh.isbn, b.title, b.img_file_url, bh.patron_id, DATE_FORMAT(bh.return_date, '%m/%d/%Y') AS return_date 
+    FROM Book_Hold bh 
+    INNER JOIN Book b ON bh.isbn = b.isbn 
+    WHERE bh.patron_id = patron_id;
 END $$
 
 /* Get Books Reserved By Patron ID Procedure */
@@ -463,7 +463,7 @@ BEGIN
     SELECT MIN(bc.copy_number) AS Available_Copy 
     FROM Book_Copy bc 
     WHERE bc.isbn = isbn && bc.copy_number NOT IN (
-        SELECT bl.copy_number FROM Book_Loan bl WHERE bl.isbn = isbn);
+        SELECT bh.copy_number FROM Book_Hold bh WHERE bh.isbn = isbn);
 END $$
 
 /* Get Patron by patron_id */
@@ -570,14 +570,14 @@ END $$
 
 /* Insert Book Genre Data */
 DELIMITER $$
-CREATE PROCEDURE `sp_insert_book_loan`(
+CREATE PROCEDURE `sp_insert_book_hold`(
     in isbn        varchar(10),
     in copy_number int,
     in patron_id   int,
     in return_date date
 )
 BEGIN
-    INSERT INTO Book_Loan(isbn, copy_number, patron_id, return_date) 
+    INSERT INTO Book_Hold(isbn, copy_number, patron_id, return_date) 
     VALUES (isbn, copy_number, patron_id, return_date);
 END $$
 
@@ -605,12 +605,12 @@ END $$
 
 /* Delete Book Loan by isbn and patron id*/
 DELIMITER $$
-CREATE PROCEDURE `sp_delete_book_loan_by_isbn_and_patron_id`(
+CREATE PROCEDURE `sp_delete_book_hold_by_isbn_and_patron_id`(
     in _isbn      varchar(10),
     in _patron_id int
 )
 BEGIN
-    DELETE FROM Book_Loan WHERE isbn = _isbn AND patron_id = _patron_id;
+    DELETE FROM Book_Hold WHERE isbn = _isbn AND patron_id = _patron_id;
 END $$
 
 /* Delete Book Loan by isbn and patron id*/
