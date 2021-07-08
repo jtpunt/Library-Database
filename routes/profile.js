@@ -61,7 +61,7 @@ router.route('/holds')
 			let context   = { scripts:  ["/static/js/books.js"] },
 			 	mysql 	  = req.app.get('mysql'),
 				patron_id = req.session.patron_id,
-				sql       = `CALL sp_get_books_checked_out_by_patron_id(?)`;
+				sql       = `CALL sp_get_book_holds_by_patron_id(?)`;
 
 			mysql.pool.query(sql, patron_id, function(error, results, fields){
                 if(error){
