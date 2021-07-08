@@ -287,7 +287,7 @@ router.route('/:isbn/hold')
             getAvailableCopy(res, mysql, req.params.isbn, context, complete);
             function complete(){
                 var inserts = [req.params.isbn, context.Available, req.session.patron_id, '2017-12-01'];
-                insertBookLoan(res, mysql, inserts, finalComplete)
+                insertBookHold(res, mysql, inserts, finalComplete)
             }
             function finalComplete(){
                 // WARNING: Initially did not work on OSU server for some reason
@@ -459,7 +459,7 @@ function insertBookCopies(res, mysql, inserts, complete){
     }
     complete();
 }
-function insertBookLoan(res, mysql, inserts, complete){
+function insertBookHold(res, mysql, inserts, complete){
     let sql = `CALL sp_insert_book_hold(?, ?, ?, ?)`;
     mysql.pool.query(sql, inserts, function(error, results, fields){
         if(error){
