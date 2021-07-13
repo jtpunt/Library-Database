@@ -43,7 +43,7 @@ DROP PROCEDURE IF EXISTS sp_insert_book_reservation;
 
 /* Delete Data Procedures */
 DROP PROCEDURE IF EXISTS sp_delete_book_by_isbn;
-DROP PROCEDURE IF EXISTS sp_delete_book_hold_by_isbn_and_patron_id;
+DROP PROCEDURE IF EXISTS sp_delete_book_hold_by_isbn_copy_num_and_patron_id;
 DROP PROCEDURE IF EXISTS sp_delete_book_reservation_by_isbn_and_patron_id;
 
 /* Update Data Procedures */
@@ -430,7 +430,7 @@ CREATE PROCEDURE `sp_get_book_holds_by_patron_id`(
     in patron_id int
 )
 BEGIN
-    SELECT bh.isbn, b.title, b.img_file_url, bh.patron_id, DATE_FORMAT(bh.return_date, '%m/%d/%Y') AS return_date 
+    SELECT bh.isbn, bh.copy_number, b.title, b.img_file_url, bh.patron_id, DATE_FORMAT(bh.return_date, '%m/%d/%Y') AS return_date 
     FROM Book_Hold bh 
     INNER JOIN Book b ON bh.isbn = b.isbn 
     WHERE bh.patron_id = patron_id;
@@ -610,12 +610,14 @@ END $$
 
 /* Delete Book Loan by isbn and patron id*/
 DELIMITER $$
-CREATE PROCEDURE `sp_delete_book_hold_by_isbn_and_patron_id`(
-    in _isbn      varchar(10),
-    in _patron_id int
+CREATE PROCEDURE `sp_delete_book_hold_by_isbn_copy_num_and_patron_id`(
+    in _isbn        varchar(10),
+    in _copy_number int,
+    in _patron_id   int
 )
 BEGIN
-    DELETE FROM Book_Hold WHERE isbn = _isbn AND patron_id = _patron_id;
+    DELETE FROM Book_Hold 
+    WHERE isbn = _isbn AND copy_number = _copy_number AND patron_id = _patron_id;
 END $$
 
 /* Delete Book Loan by isbn and patron id*/

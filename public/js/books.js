@@ -39,11 +39,12 @@ function deleteBook(isbn){
         }
     });
 }
-function deleteBookHold(isbn){
+function deleteBookHold(isbn, copy_number){
     var myObj = {};
     myObj.isbn = isbn;
+    console.log(`copy_number: ${copy_number}`);
     $.ajax({
-        url: `/book/${isbn}/hold`,
+        url: `/book/${isbn}/copy_number/${copy_number}/hold`,
         type: 'delete',
         async:false,
         success: function(response){

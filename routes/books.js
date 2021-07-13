@@ -276,54 +276,52 @@ router.get('/:isbn/edit', middleware.isAdmin, function(req,res){
         }
     });
 });
-router.route('/:isbn/hold')
-    // CREATE a book loan by isbn 
-    .post(middleware.isLoggedIn,
-        (req, res) =>{
-            let context = {},
-                mysql   = req.app.get('mysql');
-            console.log(`in POST -> /${req.params.isbn}/hold`);
-            // this function returns an available copy number for the book that's being loaned out
-            getAvailableCopy(res, mysql, req.params.isbn, context, complete);
-            function complete(){
-                var inserts = [req.params.isbn, context.Available, req.session.patron_id, '2017-12-01'];
-                insertBookHold(res, mysql, inserts, finalComplete)
-            }
-            function finalComplete(){
-                // WARNING: Initially did not work on OSU server for some reason
-                //res.redirect(req.get('referer')); // refreshed the current page
+// CREATE a book hold by isbn 
+router.post('/:isbn/hold', middleware.isLoggedIn,
+    function(req,res){
+        let context = {},
+            mysql   = req.app.get('mysql');
+        console.log(`in POST -> /${req.params.isbn}/hold`);
+        // this function returns an available copy number for the book that's being loaned out
+        getAvailableCopy(res, mysql, req.params.isbn, context, complete);
+        function complete(){
+            var inserts = [req.params.isbn, context.Available, req.session.patron_id, '2017-12-01'];
+            insertBookHold(res, mysql, inserts, finalComplete)
+        }
+        function finalComplete(){
+            // WARNING: Initially did not work on OSU server for some reason
+            //res.redirect(req.get('referer')); // refreshed the current page
+            res.end();
+        }
+    }
+)
+// Delete a book hold by isbn, copy_number and the logged in user's patron_id
+router.delete('/:isbn/copy_number/:copy_number/hold', middleware.isLoggedIn, 
+    function(req,res){
+        let mysql       = req.app.get('mysql'),
+            isbn        = req.params['isbn'],
+            copy_number = req.params['copy_number']
+            patron_id   = req.session.patron_id,
+            inserts     = [isbn, copy_number, patron_id],
+            sql         = `CALL sp_delete_book_hold_by_isbn_copy_num_and_patron_id(?, ?, ?)`;
+        console.log(`in delete isbn, copy_number -> ${inserts}`);
+        mysql.pool.query(sql, inserts, function(error, results, fields){
+            if(error){
+                console.log(`error? - ${JSON.stringify(error)}`);
+                req.flash("error", "You have already reserved this book");
+                res.end();
+            }else if(results.affectedRows === 0){
+                console.log("no results found");
                 res.end();
             }
-        }
-    )
-    // Delete a book hold
-    .delete(middleware.isLoggedIn,
-        (req, res) => {
-            console.log(`\nin DELETE -> /book/${req.params.isbn}/hold`);
-            let mysql     = req.app.get('mysql'),
-                isbn      = req.params['isbn'],
-                patron_id = req.session.patron_id,
-                inserts   = [isbn, patron_id],
-                sql       = `CALL sp_delete_book_hold_by_isbn_and_patron_id(?, ?)`;
-
-            mysql.pool.query(sql, inserts, function(error, results, fields){
-                if(error){
-                    console.log(`error? - ${JSON.stringify(error)}`);
-                    req.flash("error", "You have already reserved this book");
-                    res.end();
-                }else if(results.affectedRows === 0){
-                    console.log("no results found");
-                    res.end();
-                }
-                else{
-                    console.log(`results: ${JSON.stringify(results)}`);
-                    console.log(`fields: ${JSON.stringify(fields)}`);
-                    res.end();
-                }
-            });
-        }
-    )
-
+            else{
+                console.log(`results: ${JSON.stringify(results)}`);
+                console.log(`fields: ${JSON.stringify(fields)}`);
+                res.end();
+            }
+        });
+    }
+)
 router.route('/:isbn/reserve')
     // Reserve a book
     .post(middleware.isLoggedIn,
