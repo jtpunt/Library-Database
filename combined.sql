@@ -15,7 +15,9 @@ DROP PROCEDURE IF EXISTS sp_get_publishers;
 DROP PROCEDURE IF EXISTS sp_get_authors;
 DROP PROCEDURE IF EXISTS sp_get_patrons;
 DROP PROCEDURE IF EXISTS sp_get_genres;
+DROP PROCEDURE IF EXISTS sp_get_holds;
 
+/* Get Data By Parameter(s) Procedures */
 DROP PROCEDURE IF EXISTS sp_get_book_by_isbn;
 DROP PROCEDURE IF EXISTS sp_get_current_book_by_isbn;
 DROP PROCEDURE IF EXISTS sp_get_author_by_full_name;
@@ -280,28 +282,21 @@ INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0553448129', 0);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0553448129', 1);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0553448129', 2);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0553448129', 3);
-
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0439064864', 0);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0439064864', 1);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0439064864', 2);
-
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0747551006', 0);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0747551006', 1);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0747551006', 2);
-
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0439136350', 0);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0439136350', 1);
-
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('1469283298', 0);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('1469283298', 1);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('1469283298', 2);
-
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0061348104', 0);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0061348104', 1);
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0061348104', 2);
-
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0439784549', 0);
-
 INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0553582011', 0);
 /***********************
 * Book Loans Inserts
@@ -363,6 +358,15 @@ DELIMITER $$
 CREATE PROCEDURE `sp_get_genres`()
 BEGIN
   SELECT DISTINCT genre_id, genre_name FROM Genre ORDER BY genre_name ASC;
+END $$
+
+/* Get All Holds */
+DELIMITER $$
+CREATE PROCEDURE `sp_get_holds`()
+BEGIN
+  SELECT bh.isbn, b.title, b.img_file_url, bh.copy_number, bh.return_date, CONCAT(p.first_name, ' ', p.last_name) AS Full_Name FROM Book_Hold bh
+  INNER JOIN Patron p ON bh.patron_id = p.patron_id
+  INNER JOIN Book b ON bh.isbn = b.isbn;
 END $$
 
 /* Get Book By ISBN Procedure */
@@ -486,6 +490,7 @@ BEGIN
     WHERE email = email AND password = password 
     LIMIT 1;
 END $$
+
 
 /* Insert Book Data */
 DELIMITER $$
