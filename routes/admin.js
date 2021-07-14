@@ -8,7 +8,7 @@ router.get('/', middleware.isAdmin, function(req,res){
     res.render('admin/index');
 });
 router.get('/hold', middleware.isAdmin, function(req,res){
-	let context = {},
+	let context = { scripts:  ["/static/js/admin/deleteHold.js"] },
 		mysql 	= req.app.get('mysql'),
 		sql   	= `CALL sp_get_holds()`;
 

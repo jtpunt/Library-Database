@@ -364,7 +364,7 @@ END $$
 DELIMITER $$
 CREATE PROCEDURE `sp_get_holds`()
 BEGIN
-  SELECT bh.isbn, b.title, b.img_file_url, bh.copy_number, bh.return_date, CONCAT(p.first_name, ' ', p.last_name) AS Full_Name FROM Book_Hold bh
+  SELECT bh.isbn, bh.patron_id, b.title, b.img_file_url, bh.copy_number, bh.return_date, CONCAT(p.first_name, ' ', p.last_name) AS Full_Name FROM Book_Hold bh
   INNER JOIN Patron p ON bh.patron_id = p.patron_id
   INNER JOIN Book b ON bh.isbn = b.isbn;
 END $$

@@ -17,7 +17,7 @@
 						<td><%= hold.title %></td>
 						<td><%= hold.return_date %></td>
 						<td>
-                            <button class="btn btn-warning" onclick="deleteBookHold('<%= hold.isbn %>')">Remove Hold</button>
+                            <button class="btn btn-warning" onclick="deleteBookHold('<%= hold.isbn %>', '<%= hold.copy_number %>')">Remove Hold</button>
 						</td>
 					</tr>
 				<% }); %>

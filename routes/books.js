@@ -322,6 +322,33 @@ router.delete('/:isbn/copy_number/:copy_number/hold', middleware.isLoggedIn,
         });
     }
 )
+router.delete('/:isbn/copy_number/:copy_number/patron_id/:patron_id/hold', middleware.isAdmin, 
+    function(req,res){
+        let mysql       = req.app.get('mysql'),
+            isbn        = req.params['isbn'],
+            copy_number = req.params['copy_number'],
+            patron_id   = req.params['patron_id'],
+            inserts     = [isbn, copy_number, patron_id],
+            sql         = `CALL sp_delete_book_hold_by_isbn_copy_num_and_patron_id(?, ?, ?)`;
+        console.log(`in delete isbn, copy_number, patron_id -> ${inserts}`);
+        console.log(`req.params: ${JSON.stringify(req.params)}`);
+        mysql.pool.query(sql, inserts, function(error, results, fields){
+            if(error){
+                console.log(`error? - ${JSON.stringify(error)}`);
+                req.flash("error", "You have already reserved this book");
+                res.end();
+            }else if(results.affectedRows === 0){
+                console.log("no results found");
+                res.end();
+            }
+            else{
+                console.log(`results: ${JSON.stringify(results)}`);
+                console.log(`fields: ${JSON.stringify(fields)}`);
+                res.end();
+            }
+        });
+    }
+)
 router.route('/:isbn/reserve')
     // Reserve a book
     .post(middleware.isLoggedIn,
