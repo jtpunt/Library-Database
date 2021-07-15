@@ -129,7 +129,7 @@ CREATE TABLE Book_Hold(
   isbn        varchar(10)  NOT NULL,
   copy_number int      NOT NULL,
   patron_id   int      NOT NULL,
-  return_date date     NOT NULL,
+  return_date datetime     NOT NULL,
   CONSTRAINT unique_Book_Hold UNIQUE(isbn, copy_number),
   PRIMARY KEY (isbn, copy_number),
   FOREIGN KEY (isbn) REFERENCES Book(isbn) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -140,7 +140,7 @@ CREATE TABLE Book_Hold(
 CREATE TABLE Book_Reservation(
   isbn  varchar(10) NOT NULL,
   patron_id int NOT NULL,
-  reserve_date date NOT NULL,
+  reserve_date datetime NOT NULL,
   PRIMARY KEY (isbn, patron_id),
   FOREIGN KEY (isbn) REFERENCES Book(isbn) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (patron_id) REFERENCES Patron(patron_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -302,10 +302,10 @@ INSERT INTO Book_Copy(isbn, copy_number) VALUES ('0553582011', 0);
 * Book Loans Inserts
 ***********************/
 INSERT INTO Book_Hold(isbn, copy_number, patron_id, return_date) VALUES('0553448129', 0, 
-  (SELECT patron_id FROM Patron WHERE last_name = 'Perry' && first_name = "Jonathan"), '2017-12-01'
+  (SELECT patron_id FROM Patron WHERE last_name = 'Perry' && first_name = "Jonathan"), current_timestamp()
 );
 INSERT INTO Book_Hold(isbn, copy_number, patron_id, return_date) VALUES('0553448129', 3, 
-  (SELECT patron_id FROM Patron WHERE last_name = 'Pinkerton' && first_name = "Mike"), '2017-12-12'
+  (SELECT patron_id FROM Patron WHERE last_name = 'Pinkerton' && first_name = "Mike"), current_timestamp()
 );
 
 /* 
@@ -360,14 +360,19 @@ BEGIN
   SELECT DISTINCT genre_id, genre_name FROM Genre ORDER BY genre_name ASC;
 END $$
 
-/* Get All Holds */
+/* 
+    Get All Holds 
+    reserve_date column formatted to MM-DD-YYYY hh:mm AM/PM
+*/
 DELIMITER $$
 CREATE PROCEDURE `sp_get_holds`()
-BEGIN
-  SELECT bh.isbn, bh.patron_id, b.title, b.img_file_url, bh.copy_number, bh.return_date, CONCAT(p.first_name, ' ', p.last_name) AS Full_Name FROM Book_Hold bh
+BEGIN 
+  SELECT bh.isbn, bh.patron_id, b.title, b.img_file_url, bh.copy_number, DATE_FORMAT(bh.return_date, '%m/%d/%Y %h:%i %p') AS return_date, CONCAT(p.first_name, ' ', p.last_name) AS Full_Name FROM Book_Hold bh
   INNER JOIN Patron p ON bh.patron_id = p.patron_id
   INNER JOIN Book b ON bh.isbn = b.isbn;
 END $$
+
+
 
 /* Get Book By ISBN Procedure */
 DELIMITER $$
@@ -430,7 +435,7 @@ CREATE PROCEDURE `sp_get_book_holds_by_patron_id`(
     in patron_id int
 )
 BEGIN
-    SELECT bh.isbn, bh.copy_number, b.title, b.img_file_url, bh.patron_id, DATE_FORMAT(bh.return_date, '%m/%d/%Y') AS return_date 
+    SELECT bh.isbn, bh.copy_number, b.title, b.img_file_url, bh.patron_id, DATE_FORMAT(bh.return_date, '%m/%d/%Y %h:%i %p') AS return_date
     FROM Book_Hold bh 
     INNER JOIN Book b ON bh.isbn = b.isbn 
     WHERE bh.patron_id = patron_id;
@@ -446,13 +451,16 @@ BEGIN
     SELECT reserve_date FROM Book_Reservation WHERE isbn = _isbn AND patron_id = _patron_id;
 END $$
 
-/* Get Books Reserved By Patron ID Procedure */
+/* 
+    Get Books Reserved By Patron ID Procedure 
+    reserve_date column formatted to MM-DD-YYYY hh:mm AM/PM
+*/
 DELIMITER $$
 CREATE PROCEDURE `sp_get_books_reserved_by_patron_id`(
     in patron_id int
 )
 BEGIN
-    SELECT br.isbn, b.title, b.img_file_url, br.patron_id, DATE_FORMAT(br.reserve_date, '%m/%d/%Y') AS reserve_date 
+    SELECT br.isbn, b.title, b.img_file_url, br.patron_id, DATE_FORMAT(br.reserve_date, '%m/%d/%Y %h:%i %p') AS reserve_date 
     FROM Book_Reservation br
     INNER JOIN Book b ON br.isbn = b.isbn
     WHERE br.patron_id = patron_id;

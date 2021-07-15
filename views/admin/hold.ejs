@@ -17,9 +17,9 @@
 						<td scope="row"><%= hold.Full_Name %></td>
 						<td><%= hold.isbn %></td>
 						<td><%= hold.title %></td>
-						<td><%= hold.return_date %> -  <%= hold.patron_id %></td>
+						<td><%= hold.return_date %></td>
 						<td>
-                            <button class="btn btn-warning" onclick="deleteHold('<%= hold.isbn %>', '<%= hold.copy_number%>', '<%= hold.patron_id %>')">Remove Hold <%= hold.patron_id %></button>
+                            <button class="btn btn-warning" onclick="deleteHold('<%= hold.isbn %>', '<%= hold.copy_number%>', '<%= hold.patron_id %>')">Remove Hold</button>
 						</td>
 					</tr>
 				<% }); %>

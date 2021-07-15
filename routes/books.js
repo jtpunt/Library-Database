@@ -129,7 +129,7 @@ router.route('/')
         }
     )
 
-router.get('/filter',function(req,res){
+router.get('/filter', function(req,res){
     let callbackCount = 0,
         mysql         = req.app.get('mysql'),
         context       = {
