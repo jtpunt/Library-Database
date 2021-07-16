@@ -16,6 +16,7 @@ DROP PROCEDURE IF EXISTS sp_get_authors;
 DROP PROCEDURE IF EXISTS sp_get_patrons;
 DROP PROCEDURE IF EXISTS sp_get_genres;
 DROP PROCEDURE IF EXISTS sp_get_holds;
+DROP PROCEDURE IF EXISTS sp_get_past_due_holds;
 
 /* Get Data By Parameter(s) Procedures */
 DROP PROCEDURE IF EXISTS sp_get_book_by_isbn;
@@ -367,11 +368,24 @@ END $$
 DELIMITER $$
 CREATE PROCEDURE `sp_get_holds`()
 BEGIN 
-  SELECT bh.isbn, bh.patron_id, b.title, b.img_file_url, bh.copy_number, DATE_FORMAT(bh.return_date, '%m/%d/%Y %h:%i %p') AS return_date, CONCAT(p.first_name, ' ', p.last_name) AS Full_Name FROM Book_Hold bh
+  SELECT bh.isbn, bh.patron_id, b.title, b.img_file_url, bh.copy_number, DATE_FORMAT(bh.return_date, '%m/%d/%Y %h:%i %p') AS return_date, CONCAT(p.first_name, ' ', p.last_name) AS Full_Name 
+  FROM Book_Hold bh
   INNER JOIN Patron p ON bh.patron_id = p.patron_id
   INNER JOIN Book b ON bh.isbn = b.isbn;
 END $$
-
+/* 
+    Get All Holds That Are Past Due
+    reserve_date column formatted to MM-DD-YYYY hh:mm AM/PM
+*/
+DELIMITER $$
+CREATE PROCEDURE `sp_get_past_due_holds`()
+BEGIN 
+  SELECT bh.isbn, bh.patron_id, b.title, b.img_file_url, bh.copy_number, DATE_FORMAT(bh.return_date, '%m/%d/%Y %h:%i %p') AS return_date, CONCAT(p.first_name, ' ', p.last_name) AS Full_Name 
+  FROM Book_Hold bh
+  INNER JOIN Patron p ON bh.patron_id = p.patron_id
+  INNER JOIN Book b ON bh.isbn = b.isbn
+  WHERE current_timestamp() > bh.return_date;
+END $$
 
 
 /* Get Book By ISBN Procedure */

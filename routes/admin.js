@@ -27,7 +27,7 @@ router.get('/hold', middleware.isAdmin, function(req,res){
 router.get('/hold/late', middleware.isAdmin, function(req,res){
     let context = { scripts:  ["/static/js/admin/deleteHold.js"] },
         mysql   = req.app.get('mysql'),
-        sql     = `CALL sp_get_holds()`;
+        sql     = `CALL sp_get_past_due_holds()`;
 
     mysql.pool.query(sql, function(error, results, fields){
         if(error){
@@ -37,7 +37,7 @@ router.get('/hold/late', middleware.isAdmin, function(req,res){
         }else{
             console.log(`results: ${JSON.stringify(results)}`);
             context.holds = results[0];
-            res.render('admin/hold', context);
+            res.render('admin/late', context);
         }
     });
 });

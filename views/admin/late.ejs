@@ -1,9 +1,9 @@
 <%- include ('../partials/header') %>
 <div class="row">
 	<div class="col-md-9 mx-auto">
-		<table class="table">
+		<table class="table table-striped">
 			<caption style="caption-side: top;">
-				<h1>Current Holds</h1>
+				<h1>Past Due Holds</h1>
 			</caption>
 			<thead>
 				<tr>
@@ -16,7 +16,7 @@
 			</thead>
 			<tbody>
 				<% holds.forEach(function(hold){ %>
-					<tr>
+					<tr class="table-danger">
 						<td scope="row"><%= hold.Full_Name %></td>
 						<td><%= hold.isbn %></td>
 						<td><%= hold.title %></td>
@@ -28,7 +28,6 @@
 				<% }); %>
 			</tbody>
 		</table>
-
 	</div>
 </div>
 <%- include ('../partials/footer') %>
