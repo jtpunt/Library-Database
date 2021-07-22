@@ -57,12 +57,12 @@
             <li class="list-group-item text-center"><h2><%= books.length %> results</h2></li>
             <% books.forEach(function(book){ %>
                 <li class="list-group-item">
-                    <div class="card bg-light mb-3">
+                    <div class="card text-white bg-secondary border-dark mb-3">
                         <div class="row g-0"> 
-                            <div class="col-sm-2">
+                            <div class="col-sm-3">
                                 <img class="card-img" src="<%=book.img_file_url%>">
                             </div>
-                            <div class="col-sm-10">
+                            <div class="col-sm-9">
                                 <div lass="card-body">
                                     <div class="card-header"><%=book.title%></div>
                                     <ul class="list-group list-group-flush">
@@ -95,7 +95,7 @@
             </li>
             <% holds.forEach(function(hold){ %>
                 <li class="list-group-item">
-                    <div class="card mb-3">
+                    <div class="card text-white bg-secondary border-dark mb-3">
                         <div class="row g-0">
                             <div class="col-sm-4">
                                 <img class="card-img" src="<%=hold.img_file_url%>">
@@ -105,7 +105,7 @@
                                     <h5 class="card-title"><%=hold.title%></h5>
                                     <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p> -->
                                     <p class="card-text">
-                                        <small class="text-muted">Return on <%=hold.return_date %></small>
+                                        <small>Return on <%=hold.return_date %></small>
                                     </p>
                                 </div>
                                 <div class="card-footer bg-transparent border-success">
