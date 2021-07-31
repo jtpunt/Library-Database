@@ -1,0 +1,47 @@
+<%- include ('../partials/header') %>
+<div class="col-sm-6 text-center mx-auto">
+    <form id="add-Book" action="/books" method="post">
+        <fieldset>
+            <legend>Add Email Details</legend>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="isbn">ISBN-10</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="isbn" id="isbn" required>
+                    <div id="isbnError" class="icon" hidden="false"></div>
+                    <div id="isbnCheck" class="icon" hidden="true"></div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="title">Title Name</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="title" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="desc">Description</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="desc" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="pages">Pages</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="pages" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="img_file_url">Image URL</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" name="img_file_url" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="copies">Copies</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" name="copies" required>
+                </div>
+            </div>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+<%- include ('../partials/footer') %>
