@@ -23,6 +23,11 @@ const email = new Email({
             rejectUnauthorized: false
         }
     },
+    views: {
+        options: {
+            extension: 'ejs' // <---- HERE
+        }
+    }
 });
 
 email
