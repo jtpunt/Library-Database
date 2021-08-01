@@ -10,7 +10,7 @@ const email = new Email({
         from: 'jonathan.perry1994@gmail.com'
     },
     // uncomment below to send emails in development/test env:
-    send: true,
+    // send: true,
     transport: {
         host: process.env.MAIL_HOST,
         port: process.env.MAIL_PORT,

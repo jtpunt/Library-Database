@@ -1,39 +1,21 @@
-<!DOCTYPE html>
-<html xmlns:v>
-	<head xmln='https://www.w3.org/1999/xhtml'>
-	    <meta http-equiv="Content-Type" content='text/html; charset=UTF-8'>
-	    <meta http-equiv="X-UA-Compatible content='IE=edge'">
-	    <neta name='x-apple-disable-nessage-reformatting'>
-	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Hi <%= name %> EJS</title>
-		<style>
-			table, th, td, tr, tbody {
-				border: 0;
-				border-spacing: 0;
-				padding: 0;
-				margin: auto;
-			}
-			#main-table{
-				width: 750px;
-				height: auto;
-				border: 4px solid gray;
-			}
-		</style>
-	</head>
-	<body style="width: device-width">
-		<table id='main-table' border='0' cellpadding='0' cellspacing='0' align='center' class='MsoNormalTable'>
-			<tr>
-				<td>
-					<table border='0' cellpadding='0' cellspacing='0' align='center' class='MsoNormalTable'>
-						<tr>
-							<td style="background: gray">
-								Hi <%= name %> EJS
-							</td>
-							
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-	</body>
-</html>
+<%- include ('partials/header') %>
+<table id='main-table' border='0' cellpadding='0' cellspacing='0' align='center' class='MsoNormalTable'>
+	<tr>
+		<td>
+			<table border='0' cellpadding='0' cellspacing='0' align='center' class='MsoNormalTable'>
+				<tr>
+					<td style="background: gray">
+						Library Database System
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<p><%= name %>, </p>
+			<p>The Library Database has ...</p>
+		</td>
+	</tr>
+</table>
+<%- include ('partials/footer') %>
