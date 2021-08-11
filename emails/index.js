@@ -26,7 +26,7 @@ function sendTokenEmail(templateName, userEmail, token) {
         },
         views: {
             options: {
-                extension: 'ejs' // <---- HERE
+                extension: 'ejs'
             }
         }
     })
