@@ -7,12 +7,14 @@
 	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Hi <%= name %> EJS</title>
 		<style>
+		/*
 			table, th, td, tr, tbody {
 				border: 0;
 				border-spacing: 0;
 				padding: 0;
 				margin: auto;
 			}
+*/
 			v:oval{
 				display: block;
 				width: 60px;
@@ -25,8 +27,20 @@
 			}
 			#main-table{
 				width: 600px;
-				height: auto;
-				border: 4px solid blue;
+				height: 800px;
+				border: 2px solid black;
+				border-collapse: collapse;
+			}
+			/* Logo */
+			#top-bar{
+				width: inherit;
+				height: 75px;
+				background-color: gray;
+				border-bottom: 1px solid black;
+			}
+			#main-table > #top-bar > td {
+				width: inherit;
+				height: inherit;
 			}
 			body{
 				margin: 0;
@@ -35,3 +49,4 @@
 		</style>
 	</head>
 	<body style="width: device-width">
+		<table id='main-table' border='0' cellpadding='0' cellspacing='0' align='center' class='MsoNormalTable'>

@@ -49,7 +49,7 @@ function sendTokenEmail(templateName, userEmail, token) {
             from: 'jonathan.perry1994@gmail.com'
         },
         // uncomment below to send emails in development/test env:
-        send: true,
+        // send: true,
         // preview: true,
         transport: {
             host: process.env.MAIL_HOST,
