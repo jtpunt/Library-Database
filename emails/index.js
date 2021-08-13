@@ -12,7 +12,7 @@ function sendTokenEmail(templateName, userEmail, token) {
         },
         // uncomment below to send emails in development/test env:
         send: true,
-        // preview: true,
+        preview: false,
         transport: {
             host: process.env.MAIL_HOST,
             port: process.env.MAIL_PORT,
@@ -44,4 +44,4 @@ function sendTokenEmail(templateName, userEmail, token) {
             console.log('res.originalMessage', res.originalMessage)
         })
 }
-  module.exports = sendTokenEmail;
+module.exports = sendTokenEmail;

@@ -3,9 +3,10 @@
 * Date: 12/03/17
 * Assignment: CS 340 - Project
 *******************************************/
-var express    = require("express"),
-    middleware = require("../middleware"),
-    router     = express.Router();
+var express        = require("express"),
+    middleware     = require("../middleware"),
+    sendTokenEmail = require("../emails"),
+    router         = express.Router();
 
 router.get('/',function(req,res){
     var context = {};
@@ -48,9 +49,15 @@ router.post('/login', function(req, res){
                     req.session.admin = false;
                     redirect = "/"; // Go to user dashboard
                 }
+
+
                 req.session.patron_id = results[0][0].patron_id;
                 req.session.username = results[0][0].first_name + ' ' + results[0][0].last_name;
                 console.log(`fullname - ${req.session.username}`);
+                let userEmail = req.body.email,
+                    token = { name: req.session.username },
+                    templateName = "mars";
+                sendTokenEmail(templateName, userEmail, token);
                 req.flash("success", "Successfully logged in as " + req.session.username + ".");
                 res.redirect(redirect);
             }

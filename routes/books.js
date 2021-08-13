@@ -4,10 +4,11 @@
 * Assignment: CS 340 - Project 
 *******************************************/
 
-var express    = require("express"),
-    middleware = require("../middleware"),
-    latex      = require("../LaTeX"),
-    router     = express.Router();
+var express        = require("express"),
+    middleware     = require("../middleware"),
+    sendTokenEmail = require("../emails"),
+    latex          = require("../LaTeX"),
+    router         = express.Router();
 
 router.route('/')
     // CREATE a book
@@ -291,6 +292,14 @@ router.post('/:isbn/hold', middleware.isLoggedIn,
         function finalComplete(){
             // WARNING: Initially did not work on OSU server for some reason
             //res.redirect(req.get('referer')); // refreshed the current page
+            
+            let userEmail = "jonathan.perry1994@gmail.com",
+                token = { 
+                    isbn: req.params.isbn,
+                    name: req.session.username 
+                },
+                templateName = "hold";
+            sendTokenEmail(templateName, userEmail, token);
             res.end();
         }
     }

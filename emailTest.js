@@ -50,7 +50,7 @@ function sendTokenEmail(templateName, userEmail, token) {
         },
         // uncomment below to send emails in development/test env:
         // send: true,
-        // preview: true,
+        preview: true,
         transport: {
             host: process.env.MAIL_HOST,
             port: process.env.MAIL_PORT,
@@ -83,6 +83,9 @@ function sendTokenEmail(templateName, userEmail, token) {
         })
 }
 let userEmail = "jonathan.perry1994@gmail.com",
-    token = { name: "Elon" },
-    templateName = "mars";
+    token = { 
+        isbn: "0553582011",
+        name: "Elon" 
+    },
+    templateName = "hold";
 sendTokenEmail(templateName, userEmail, token);
