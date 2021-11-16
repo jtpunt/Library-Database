@@ -106,11 +106,11 @@ router.route('/')
                     genres: [],
                     publishers: [],
                     holds: [],
-                    stylesheets: ["/static/css/books.css"],
-                    scripts:  ["/static/js/books.js"],
+                    // stylesheets: ["/static/css/books.css"],
+                    // scripts:  ["/static/js/books.js"],
                 },
                 numOfCallBacks = (req.session.patron_id ? 6 : 5);
-            
+            console.log("Data being requested by angular");
             getBooks(res, mysql, context, complete);
             getPublishers(res, mysql, context, complete);
             getAuthors(res, mysql, context, complete);
@@ -124,7 +124,9 @@ router.route('/')
             function complete(){
                 callbackCount++;
                 if(callbackCount >= numOfCallBacks){
-                    res.render('books/index', context);
+                    res.status(200).send(context);
+                    // res.end(200);
+                    // res.render('books/index', context);
                 }
             }
         }

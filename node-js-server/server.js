@@ -11,6 +11,7 @@ var express = require('express'),
 	bodyParser = require('body-parser'), // body parser middleware
 	methodOverride = require("method-override"),
 	flash          = require("connect-flash"),
+        cors           = require('cors'),
 	port = 3005,
 	ip = process.env.IP,
 	app = express();
@@ -33,6 +34,8 @@ app.set('mysql', mysql);
 /**********************************************************************
 * Setup what type of data the server can receive via GET/POST requests
 **********************************************************************/
+app.use(cors());
+app.options('*', cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); 
 app.use(methodOverride("_method"));
