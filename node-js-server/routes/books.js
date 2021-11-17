@@ -101,21 +101,21 @@ router.route('/')
           	let callbackCount = 0,
                 mysql         = req.app.get('mysql'),
                 context       = {
-                    authors: [],
+                    // authors: [],
                     books: [],
-                    genres: [],
-                    publishers: [],
-                    holds: [],
+                    // genres: [],
+                    // publishers: [],
+                    // holds: [],
                     // stylesheets: ["/static/css/books.css"],
                     // scripts:  ["/static/js/books.js"],
                 },
                 numOfCallBacks = (req.session.patron_id ? 6 : 5);
             console.log("Data being requested by angular");
             getBooks(res, mysql, context, complete);
-            getPublishers(res, mysql, context, complete);
-            getAuthors(res, mysql, context, complete);
-            getGenre(res, mysql, context, complete);
-            getPatrons(res, mysql, context, complete);
+            // getPublishers(res, mysql, context, complete);
+            // getAuthors(res, mysql, context, complete);
+            // getGenre(res, mysql, context, complete);
+            // getPatrons(res, mysql, context, complete);
             // if the patron is logged in, get all the books checked out by them
             if(req.session.patron_id){
                 let inserts = [req.session.patron_id];
@@ -123,11 +123,11 @@ router.route('/')
             }
             function complete(){
                 callbackCount++;
-                if(callbackCount >= numOfCallBacks){
-                    res.status(200).send(context);
+                // if(callbackCount >= numOfCallBacks){
+                    res.status(200).send(context.books);
                     // res.end(200);
                     // res.render('books/index', context);
-                }
+                // }
             }
         }
     )

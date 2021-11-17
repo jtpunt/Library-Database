@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BookService } from '../book.service';
 import { Author, Authors } from '../interfaces/authors'; 
+import { Book, Books } from '../interfaces/books'; 
 @Component({
   selector: 'app-book-list',
   templateUrl: './book-list.component.html',
@@ -20,9 +21,8 @@ export class BookListComponent implements OnInit {
         this.bookService.getAllBooks().subscribe(
             data => {
                 console.log(data);
-                var parsedObj = Object.keys(data);
-                console.log(parsedObj);
-
+         
+                this.books = data;
             },
             error => {
                 console.log("ERROR: " + error);
