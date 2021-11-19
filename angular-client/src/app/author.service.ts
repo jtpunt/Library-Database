@@ -8,7 +8,7 @@ const baseUrl = "http://localhost:3005/author";
 export class AuthorService {
 
   constructor(private http: HttpClient) { }
-    getAllBooks(){
+    getAllAuthors(){
         return this.http.get<Authors>(baseUrl);
     }
 }

@@ -5,7 +5,7 @@ import { GenreService } from '../genre.service';
 @Component({
   selector: 'app-sidebar-filter',
   templateUrl: './sidebar-filter.component.html',
-  styleUrls: ['./sidebar-filter.component.sass']
+  styleUrls: ['./sidebar-filter.component.css']
 })
 export class SidebarFilterComponent implements OnInit {
   publishers: any;
@@ -18,7 +18,7 @@ export class SidebarFilterComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-      this.authorService.getAllBooks().subscribe(
+      this.authorService.getAllAuthors().subscribe(
           data => {
               console.log(data);
        

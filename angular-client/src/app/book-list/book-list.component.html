@@ -1,39 +1,37 @@
-<p>book-list works!</p>
-<div class="col-lg-6">
-        <ul class="list-group list-group-flush">
 
-            <li class="list-group-item text-center"><h2>{{ books.length }} results</h2></li>
-    		<div *ngFor="let book of books">
-	            <li class="list-group-item">
-	                <div class="card text-white bg-secondary border-dark mb-3">
-	                    <div class="row g-0"> 
-	                        <div class="col-sm-3">
-	                            <img class="card-img" [src]="book.img_file_url">
-	                        </div>
-	                        <div class="col-sm-9">
-	                            <div lass="card-body">
-	                                <div class="card-header"><{{ book.title }}</div>
-	                                <ul class="list-group list-group-flush">
-	                                    <li class="list-group-item">Pages: {{ book.pages }}</li>
-	                                    <li class="list-group-item">Author: {{ book.Author_Name }}</li>
-	                                    <li class="list-group-item">Publisher Name: {{ book.publisher_name }} </li>
-	                                    <li class="list-group-item">Genre: {{ book.genre_name }}</li>
-	                                    <li class="list-group-item">Available: {{ book.Copies_Available }}</li>
-	                                    <li class="list-group-item">
-	                                        <div class="popup" onclick="showPopup(this)">Click To View Description
-	                                            <span class="popuptext">{{ book.description }}</span>
-	                                        </div>
-	                                    </li>
-	                                    <li class="list-group-item">
-	                                        <button class="btn btn-primary" onclick="location.href='/book/book.isbn'">View</button>
-	                                    </li>
-	                                </ul>
-	                            </div>
-	                        </div>
-	                    </div>
-	                </div>
-	            </li>
+<ul class="list-group list-group-flush">
 
-	        </div>
-        </ul>
+    <li class="list-group-item text-center"><h2>{{ books.length }} results</h2></li>
+	<div *ngFor="let book of books">
+        <li class="list-group-item">
+            <div class="card text-white bg-secondary border-dark mb-3">
+                <div class="row g-0"> 
+                    <div class="col-sm-3">
+                        <img class="card-img" [src]="book.img_file_url">
+                    </div>
+                    <div class="col-sm-9">
+                        <div lass="card-body">
+                            <div class="card-header"><{{ book.title }}</div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Pages: {{ book.pages }}</li>
+                                <li class="list-group-item">Author: {{ book.Author_Name }}</li>
+                                <li class="list-group-item">Publisher Name: {{ book.publisher_name }} </li>
+                                <li class="list-group-item">Genre: {{ book.genre_name }}</li>
+                                <li class="list-group-item">Available: {{ book.Copies_Available }}</li>
+                                <li class="list-group-item">
+                                    <div class="popup" onclick="showPopup(this)">Click To View Description
+                                        <span class="popuptext">{{ book.description }}</span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <button class="btn btn-primary" onclick="location.href='/book/book.isbn'">View</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+
     </div>
+</ul>
