@@ -18,9 +18,12 @@ var express = require('express'),
 
 // Requiring routes
 var adminRoutes   = require("./routes/admin"),
+    authorRoutes  = require("./routes/author"),
     indexRoutes   = require("./routes/index"),
 	bookRoutes    = require("./routes/books"),
-    profileRoutes = require("./routes/profile");
+    genreRoutes   = require("./routes/genre"),
+    profileRoutes = require("./routes/profile"),
+    publusherRoutes = require("./routes/publisher");
 /**********************************************************************
 * Setup our handlebars engine for handling file extensions that end in
 * 'handlebars' by registering 'handlebars' as our view engine using its
@@ -65,8 +68,11 @@ app.use(function(req, res, next){
 **********************************************************************/
 app.use("/", indexRoutes);
 app.use("/admin", adminRoutes);
+app.use("/author", authorRoutes);
 app.use("/book", bookRoutes);
+app.use("/genre", genreRoutes);
 app.use("/profile", profileRoutes);
+app.use("/publisher", publusherRoutes);
 app.use(function(req,res){
     res.status(404);
     res.render('404');

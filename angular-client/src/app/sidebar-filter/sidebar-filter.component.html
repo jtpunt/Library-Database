@@ -1,0 +1,44 @@
+<p>sidebar-filter works!</p>
+<div class="col-lg-3" id="left-sidebar-wrapper">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <h4 style="text-align: center;">Filter By</h4>
+        </li>
+        <li class="list-group-item">
+            <form action="/book/filter" method="get"> 
+                <input type="checkbox" name="showAllBooksCb" id="showAllBooksCb" checked>
+                <label for="flexCheckChecked">Show All Books</label>
+                <button class="btn btn-info float-end">Submit</button>
+            </form>
+        </li>
+        <li class="list-group-item">
+            <form action="/book/filter" method="get"> 
+                <input type="checkbox" value="" name="showAvailableBooksCb" id="showAvailableBooksCb" checked>
+                <label for="flexCheckChecked">Show Available Books</label>
+                <button class="btn btn-info float-end">Submit</button>
+            </form>
+        </li>
+        <li class="list-group-item">
+            <form action="/book/filter" method="get"> 
+                <label for="wildcard">Search by Title, Author, or Publisher Name</label>
+                <input id="wildcard" name="wildcard" type="text" placeholder="Title, Author, or Publisher">
+                <button class="btn btn-info float-end">Submit</button>
+            </form>
+        </li>
+        <li class="list-group-item">
+        	<div *ngFor="let publisher of publishers">
+                <a href="/book/filter?publisher_id=publisher.publisher_id" class="btn btn-outline-secondary btn-sm" role="button" aria-pressed="true">{{ publisher.publisher_name }}</a>
+            </div>
+        </li>
+        <li class="list-group-item">
+        	<div *ngFor="let author of authors">
+                <a href="/book/filter?author_id=author.author_id" class="btn btn-outline-secondary btn-sm" role="button" aria-pressed="true">{{ author.author_name }}</a>
+            </div>
+        </li>
+        <li class="list-group-item">
+        	<div *ngFor="let genre of genres">
+                <a href="/book/filter?genre_id=genre.genre_id" class="btn btn-outline-secondary btn-sm" role="button" aria-pressed="true">{{ genre.genre_name }}</a>
+            </div>
+        </li>
+    </ul>
+</div>
