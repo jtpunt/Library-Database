@@ -1,0 +1,94 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- Put space between ul's -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/book" style="color: black">View Books</a>
+                </li>
+<!--                 <% if(error && error.length > 0){ %>
+                    <li class="nav-item" id="alert-danger">
+                        <span class="alert alert-danger badge badge-secondary" role="alert" style="margin: 0em;"><%=error%></span>
+                    </li>
+                    <script>
+                        setTimeout(function(){
+                            $("#alert-danger").fadeOut('slow');
+                        }, 4000);
+                    </script>
+                <% } %>
+                <% if(success && success.length > 0){ %>
+                    <li class="nav-item" id="alert-success">
+                        <span class="alert alert-success badge badge-secondary" role="alert" style="margin: 0em;"><%=success%></span>
+                    </li>
+                    <script>
+                        setTimeout(function(){
+                            $("#alert-success").fadeOut('slow');
+                        }, 4000);
+                    </script>
+                <% } %> -->
+            </ul>       
+            <ul class="nav navbar-nav">
+          <!--       <% if(!currentUser){ %> -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                <!-- <% } else { %>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-fw fa-user-circle"></i> 
+                            <%= currentUser %></a>
+                        </a>
+                        <div class="dropdown-menu">
+                            <h1 class="dropdown-header">Profile</h1>
+                            <a class="dropdown-item" href="/profile/holds">
+                                <i class="fa fa-fw fa-cart-arrow-down"></i>
+                                View Holds
+                            </a>
+                            <a class="dropdown-item" href="/profile/reservations">    <i class="far fa-fw fa-calendar-alt"></i>
+                                View Reservations
+                            </a>
+                            <a class="dropdown-item" href="/profile">
+                                <i class="fa fa-fw fa-cog"></i>
+                                Profile Settings
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <% if(admin_user){ %>
+                                <h1 class="dropdown-header">Admin</h1>
+                                <a class="dropdown-item" href="/book/new">
+                                    <i class="fa fa-fw fa-plus"></i>
+                                    Add Books
+                                </a>
+                                <a class="dropdown-item" href="/admin">
+                                    <i class="fa fa-fw fa-skull-crossbones"></i>
+                                    View Admin Page
+                                </a>
+                                <a class="dropdown-item" href="/admin/hold">
+                                    <i class="fa fa-fw fa-cart-arrow-down"></i>
+                                    View Patron Holds
+                                </a>
+                                <a class="dropdown-item" href="/admin/hold/late">
+                                    <i class="fa fa-fw fa-calendar-times"></i>
+                                    View Past Due
+                                </a>
+                                <a class="dropdown-item" href="/admin/email">
+                                    <i class="fa fa-fw fa-envelope-square"></i>
+                                    Email Settings
+                                </a>
+                            <% } %>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/logout">
+                                <i class="fa fa-fw fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+                <% } %> -->
+            </ul>
+        </div> <!-- /.navbar-collapse -->
+    </div>
+</nav>

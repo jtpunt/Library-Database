@@ -7,6 +7,9 @@ import { BookListComponent } from './book-list/book-list.component';
 import { HoldListComponent } from './hold-list/hold-list.component';
 import { SidebarFilterComponent } from './sidebar-filter/sidebar-filter.component';
 import { HomeComponent } from './home/home.component';
+import { WildcardSearchComponent } from './wildcard-search/wildcard-search.component';
+import { LoginComponent } from './login/login.component';
+import { NavbarHeaderComponent } from './navbar-header/navbar-header.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +17,10 @@ import { HomeComponent } from './home/home.component';
     BookListComponent,
     HoldListComponent,
     SidebarFilterComponent,
-    HomeComponent
+    HomeComponent,
+    WildcardSearchComponent,
+    LoginComponent,
+    NavbarHeaderComponent
   ],
   imports: [
     BrowserModule,
